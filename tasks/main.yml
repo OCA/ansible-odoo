@@ -1,0 +1,155 @@
+---
+
+- name: Install Odoo dependencies
+  action: apt pkg=python-psycopg2,python-simplejson,python-lxml,python-tz,python-imaging,python-yaml,python-reportlab,python-mako,python-pychart,python-werkzeug,python-dateutil,python-unittest2,python-mock,python-openid,python-docutils,python-feedparser,python-gdata,python-jinja2,python-psutil,python-pydot,python-webdav,python-vatnumber,python-vobject,python-xlwt,python-ldap,python-openssl,python-egenix-mxdatetime,python-zsi,python-requests,python-pypdf,python-decorator,python-passlib,python-babel
+          state=installed
+          update_cache=yes
+  tags:
+    - odoo
+    - odoo_packages
+
+- name: Install common tools
+  action: apt pkg=xauth,python-pip
+          state=installed install_recommends=yes
+  tags:
+    - odoo
+    - odoo_packages
+
+- name: Add Odoo system user
+  user: name={{ odoo_user }} shell=/bin/bash
+        password={{ odoo_user_passwd }} update_password=on_create
+  tags:
+    - odoo
+    - odoo_user
+
+- name: Create log directory
+  file: path={{ odoo_logdir }} state=directory
+        owner={{ odoo_user }} group={{ odoo_user }} force=no
+  tags:
+    - odoo
+    - odoo_log
+
+- name: Project repository exists? (Mercurial)
+  stat: path={{ odoo_repo_dest }}
+  register: project_path
+  tags:
+    - odoo
+    - odoo_project
+
+- name: Clone project repository (Mercurial)
+  sudo_user: "{{ odoo_user }}"
+  hg:   repo={{ odoo_repo_url }}
+        dest={{ odoo_repo_dest }}
+        revision={{ odoo_repo_rev }}
+        force=no
+  when: odoo_repo_type == 'hg' and project_path.stat.exists == False and odoo_repo_url
+  tags:
+    - odoo
+    - odoo_project
+
+- name: Clone project repository (Git)
+  sudo_user: "{{ odoo_user }}"
+  git:  repo={{ odoo_repo_url }}
+        dest={{ odoo_repo_dest }}
+        version={{ odoo_repo_rev }}
+        update=no
+        force=no
+  when: odoo_repo_type == 'git' and odoo_repo_url
+  tags:
+    - odoo
+    - odoo_project
+
+# [ ODOO 8.0 ]
+- name: Copy Odoo configuration file (8.0)
+  template: src=odoo-server-v80.conf dest={{ odoo_config_file }}
+        owner={{ odoo_user }} group={{ odoo_user }} mode=0600
+        force={{ odoo_force_config and 'yes' or 'no' }}
+        backup=yes
+  when: odoo_version == 8.0
+  tags:
+    - odoo
+    - odoo_config
+
+- name: Copy Odoo init script (8.0)
+  template: src=odoo-server-v80.init dest=/etc/init.d/{{ odoo_service }}
+        owner=root group=root mode=0755
+        force={{ odoo_force_config and 'yes' or 'no' }}
+        backup=yes
+  when: odoo_version == 8.0
+  tags:
+    - odoo
+    - odoo_config
+# [/ ODOO 8.0 ]
+
+- name: PostgreSQL - Add the Odoo user
+  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+  remote_user: "{{ odoo_config_db_host_user }}"
+  sudo_user: postgres
+  postgresql_user: name={{ odoo_config_db_user }}
+                   role_attr_flags=CREATEDB,NOSUPERUSER
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: PostgreSQL - Set the Odoo user password
+  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+  remote_user: "{{ odoo_config_db_host_user }}"
+  sudo_user: postgres
+  postgresql_user: name={{ odoo_config_db_user }}
+                   password={{ odoo_config_db_passwd }}
+  when: odoo_config_db_passwd is defined and odoo_config_db_passwd
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: PostgreSQL - Create databases
+  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+  remote_user: "{{ odoo_config_db_host_user }}"
+  sudo_user: postgres
+  postgresql_db: name={{ item }} owner={{ odoo_config_db_user }}
+  with_items: odoo_databases
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: PostgreSQL - Active the 'unaccent' extension on databases
+  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+  remote_user: "{{ odoo_config_db_host_user }}"
+  sudo_user: postgres
+  shell: "psql {{ item }} -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
+  with_items: odoo_databases
+  when: odoo_config_unaccent
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: Set Odoo service runlevels
+  command: update-rc.d {{ odoo_service }} defaults
+  changed_when: False
+  tags:
+    - odoo
+    - odoo_init
+
+- name: Enable Odoo service
+  service: name={{ odoo_service }} enabled=yes
+  when: odoo_init == True
+  tags:
+    - odoo
+    - odoo_init
+
+- name: Disable Odoo service
+  service: name={{ odoo_service }} enabled=no
+  when: odoo_init == False
+  tags:
+    - odoo
+    - odoo_init
+
+- name: Set SSH public keys for the Odoo user
+  authorized_key: user={{ odoo_user }}
+                  key="{{ lookup('file', item) }}"
+  with_fileglob:
+    - "{{ odoo_user_sshkeys }}"
+  when: odoo_user_sshkeys is defined and odoo_user_sshkeys
+  tags:
+    - odoo
+    - odoo_ssh
