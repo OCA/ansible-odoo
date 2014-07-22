@@ -106,7 +106,14 @@
   delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
   remote_user: "{{ odoo_config_db_host_user }}"
   sudo_user: postgres
-  postgresql_db: name={{ item }} owner={{ odoo_config_db_user }}
+  postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ odoo_config_db_user }}"
+    encoding: 'UTF-8'
+    lc_collate: "{{ item.locale}}"
+    lc_ctype: "{{ item.locale }}"
+    template: "template0"
+    state: present
   with_items: odoo_databases
   tags:
     - odoo
@@ -116,7 +123,7 @@
   delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
   remote_user: "{{ odoo_config_db_host_user }}"
   sudo_user: postgres
-  shell: "psql {{ item }} -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
+  shell: "psql {{ item.name }} -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
   with_items: odoo_databases
   when: odoo_config_unaccent
   changed_when: False

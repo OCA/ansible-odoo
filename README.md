@@ -20,7 +20,7 @@ odoo_logdir: "/var/log/{{ odoo_user }}"
 odoo_workdir: "/home/{{ odoo_user }}/odoo"
 odoo_rootdir: "/home/{{ odoo_user }}/odoo/server"
 odoo_init: True
-odoo_databases: []  # [prod]
+odoo_databases: []      # [{name: prod, locale: 'en_US.UTF-8'}]
 odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
 odoo_force_config: False
 odoo_repo_type: git     # git or hg
