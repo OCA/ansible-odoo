@@ -27,6 +27,7 @@ odoo_config_db_passwd: False
 odoo_config_dbfilter: '.*'
 odoo_config_proxy_mode: False
 odoo_config_unaccent: True
+odoo_config_without_demo: False
 odoo_config_workers: 0
 odoo_config_xmlrpc_port: 8069
 odoo_config_xmlrpcs_port: 8071
