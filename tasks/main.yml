@@ -1,7 +1,7 @@
 ---
 
 - name: Install Odoo dependencies
-  action: apt pkg=python-psycopg2,python-simplejson,python-lxml,python-tz,python-imaging,python-yaml,python-reportlab,python-mako,python-pychart,python-werkzeug,python-dateutil,python-unittest2,python-mock,python-openid,python-docutils,python-feedparser,python-gdata,python-jinja2,python-psutil,python-pydot,python-webdav,python-vatnumber,python-vobject,python-xlwt,python-ldap,python-openssl,python-egenix-mxdatetime,python-zsi,python-requests,python-pypdf,python-decorator,python-passlib,python-babel
+  action: apt pkg=python-dev,python-psycopg2,python-simplejson,python-lxml,python-tz,python-imaging,python-yaml,python-reportlab,python-mako,python-pychart,python-werkzeug,python-dateutil,python-unittest2,python-mock,python-openid,python-docutils,python-feedparser,python-gdata,python-jinja2,python-psutil,python-pydot,python-webdav,python-vatnumber,python-vobject,python-xlwt,python-ldap,python-openssl,python-egenix-mxdatetime,python-zsi,python-requests,python-pypdf,python-decorator,python-passlib,python-babel
           state=installed
           update_cache=yes
   tags:
