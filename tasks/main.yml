@@ -15,6 +15,12 @@
     - odoo
     - odoo_packages
 
+- name: Install Odoo dependencies (from PyPi)
+  pip: name=psycogreen
+  tags:
+    - odoo
+    - odoo_packages
+
 - name: Add Odoo system user
   user: name={{ odoo_user }} shell=/bin/bash
         password={{ odoo_user_passwd }} update_password=on_create
