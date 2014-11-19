@@ -87,30 +87,56 @@
     - odoo_config
 # [/ ODOO 8.0 ]
 
-- name: PostgreSQL - Add the Odoo user
-  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+- name: Remote PostgreSQL - Add the Odoo user
+  delegate_to: "{{ odoo_config_db_host }}"
   remote_user: "{{ odoo_config_db_host_user }}"
+  sudo: yes
   sudo_user: postgres
   postgresql_user: name={{ odoo_config_db_user }}
                    role_attr_flags=CREATEDB,NOSUPERUSER
+  when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
   tags:
     - odoo
     - odoo_postgresql
 
-- name: PostgreSQL - Set the Odoo user password
-  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+- name: Local PostgreSQL - Add the Odoo user
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: name={{ odoo_config_db_user }}
+                   role_attr_flags=CREATEDB,NOSUPERUSER
+  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: Remote PostgreSQL - Set the Odoo user password
+  delegate_to: "{{ odoo_config_db_host }}"
   remote_user: "{{ odoo_config_db_host_user }}"
+  sudo: yes
   sudo_user: postgres
   postgresql_user: name={{ odoo_config_db_user }}
                    password={{ odoo_config_db_passwd }}
-  when: odoo_config_db_passwd is defined and odoo_config_db_passwd
+  when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
+        and odoo_config_db_passwd is defined and odoo_config_db_passwd
   tags:
     - odoo
     - odoo_postgresql
 
-- name: PostgreSQL - Create databases
-  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+- name: Local PostgreSQL - Set the Odoo user password
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: name={{ odoo_config_db_user }}
+                   password={{ odoo_config_db_passwd }}
+  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
+        and odoo_config_db_passwd is defined and odoo_config_db_passwd
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: Remote PostgreSQL - Create databases
+  delegate_to: "{{ odoo_config_db_host }}"
   remote_user: "{{ odoo_config_db_host_user }}"
+  sudo: yes
   sudo_user: postgres
   postgresql_db:
     name: "{{ item.name }}"
@@ -121,18 +147,50 @@
     template: "template0"
     state: present
   with_items: odoo_databases
+  when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
   tags:
     - odoo
     - odoo_postgresql
 
-- name: PostgreSQL - Active the 'unaccent' extension on databases
-  delegate_to: "{{ odoo_config_db_host in [False, 'localhost', '127.0.0.1'] and inventory_hostname or odoo_config_db_host }}"
+- name: Local PostgreSQL - Create databases
+  sudo: yes
+  sudo_user: postgres
+  postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ odoo_config_db_user }}"
+    encoding: 'UTF-8'
+    lc_collate: "{{ item.locale}}"
+    lc_ctype: "{{ item.locale }}"
+    template: "template0"
+    state: present
+  with_items: odoo_databases
+  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: Remote PostgreSQL - Active the 'unaccent' extension on databases
+  delegate_to: "{{ odoo_config_db_host }}"
   remote_user: "{{ odoo_config_db_host_user }}"
+  sudo: yes
   sudo_user: postgres
   shell: "psql {{ item.name }} -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
   with_items: odoo_databases
-  when: odoo_config_unaccent
+  when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
+        and odoo_config_unaccent
   changed_when: False
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- name: Local PostgreSQL - Active the 'unaccent' extension on databases
+  sudo: yes
+  sudo_user: postgres
+  shell: "psql {{ item.name }} -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
+  with_items: odoo_databases
+  changed_when: False
+  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
+        and odoo_config_unaccent
   tags:
     - odoo
     - odoo_postgresql
