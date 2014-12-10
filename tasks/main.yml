@@ -24,6 +24,7 @@
 - name: Add Odoo system user
   user: name={{ odoo_user }} shell=/bin/bash
         password={{ odoo_user_passwd }} update_password=on_create
+        system={{ odoo_user_system }}
   tags:
     - odoo
     - odoo_user

@@ -16,6 +16,7 @@ odoo_service: odoo
 odoo_version: 8.0
 odoo_user: odoo
 odoo_user_passwd: odoo
+odoo_user_system: False
 odoo_logdir: "/var/log/{{ odoo_user }}"
 odoo_workdir: "/home/{{ odoo_user }}/odoo"
 odoo_rootdir: "/home/{{ odoo_user }}/odoo/server"
