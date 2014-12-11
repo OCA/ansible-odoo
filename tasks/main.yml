@@ -184,6 +184,15 @@
     - odoo
     - odoo_postgresql
 
+- name: Local PostgreSQL - install the contrib package
+  action: apt pkg=postgresql-contrib state=installed
+  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
+        and odoo_config_unaccent
+  tags:
+    - odoo
+    - odoo_postgresql
+    - odoo_packages
+
 - name: Local PostgreSQL - Active the 'unaccent' extension on databases
   sudo: yes
   sudo_user: postgres
