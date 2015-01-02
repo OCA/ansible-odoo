@@ -36,7 +36,7 @@
     - odoo
     - odoo_log
 
-- name: Project repository exists? (Mercurial)
+- name: Project repository already cloned?
   stat: path={{ odoo_repo_dest }}
   register: project_path
   tags:
@@ -48,8 +48,8 @@
   hg:   repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
         revision={{ odoo_repo_rev }}
-        force=no
-  when: odoo_repo_type == 'hg' and project_path.stat.exists == False and odoo_repo_url
+  when: odoo_repo_type == 'hg' and odoo_repo_url
+        and (odoo_repo_update or (project_path.stat.exists == False))
   tags:
     - odoo
     - odoo_project
@@ -59,8 +59,8 @@
   git:  repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
         version={{ odoo_repo_rev }}
-        update=no
-        force=no
+        update={{ project_path.stat.exists == False and 'yes'
+                  or (odoo_repo_update and 'yes' or 'no') }}
   when: odoo_repo_type == 'git' and odoo_repo_url
   tags:
     - odoo
