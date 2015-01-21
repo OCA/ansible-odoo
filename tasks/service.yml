@@ -1,0 +1,22 @@
+---
+
+# [ 8.0 ]
+- name: Copy Odoo init script (8.0)
+  template: src=odoo-server-v80.init dest=/etc/init.d/{{ odoo_service }}
+        owner=root group=root mode=0755
+        force={{ odoo_force_config and 'yes' or 'no' }}
+        backup=yes
+  when: odoo_version == 8.0
+# [/ 8.0 ]
+
+- name: Set Odoo service runlevels
+  command: update-rc.d {{ odoo_service }} defaults
+  changed_when: False
+
+- name: Enable Odoo service
+  service: name={{ odoo_service }} enabled=yes
+  when: odoo_init == True
+
+- name: Disable Odoo service
+  service: name={{ odoo_service }} enabled=no
+  when: odoo_init == False
