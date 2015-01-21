@@ -1,0 +1,10 @@
+---
+
+# [ 8.0 ]
+- name: Copy Odoo configuration file (8.0)
+  template: src=odoo-server-v80.conf dest={{ odoo_config_file }}
+        owner={{ odoo_user }} group={{ odoo_user }} mode=0600
+        force={{ odoo_force_config and 'yes' or 'no' }}
+        backup=yes
+  when: odoo_version == 8.0
+# [/ 8.0 ]
