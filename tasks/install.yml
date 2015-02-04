@@ -42,6 +42,7 @@
     - odoo_project
 
 - name: Clone project repository (Mercurial)
+  sudo: yes
   sudo_user: "{{ odoo_user }}"
   hg:   repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
@@ -52,6 +53,7 @@
     - odoo_project
 
 - name: Clone project repository (Git)
+  sudo: yes
   sudo_user: "{{ odoo_user }}"
   git:  repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
