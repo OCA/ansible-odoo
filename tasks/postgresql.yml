@@ -37,15 +37,17 @@
   remote_user: "{{ odoo_config_db_host_user }}"
   sudo: yes
   sudo_user: postgres
-  shell: "psql template1 -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
+  command: "psql template1 -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
+  register: create_extension
+  changed_when: "'already exists' not in create_extension.stderr"
   when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
         and odoo_config_unaccent
-  changed_when: False
 
 - name: Local PostgreSQL - Active the 'unaccent' extension on databases
   sudo: yes
   sudo_user: postgres
-  shell: "psql template1 -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
-  changed_when: False
+  command: "psql template1 -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
+  register: create_extension
+  changed_when: "'already exists' not in create_extension.stderr"
   when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
         and odoo_config_unaccent
