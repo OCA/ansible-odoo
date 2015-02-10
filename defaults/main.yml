@@ -19,7 +19,9 @@ odoo_repo_update: True  # Update the working copy or not. This option is
                         # WARNING: uncommited changes will be discarded!
 
 # Configuration options
-odoo_config_addons_path: "/home/{{ odoo_user }}/odoo/server/addons,/home/{{ odoo_user }}/odoo/server/openerp/addons"
+odoo_config_addons_path:
+    - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
+    - "/home/{{ odoo_user }}/odoo/server/addons"
 odoo_config_admin_passwd: admin
 odoo_config_auto_reload: False
 odoo_config_csv_internal_sep: ','
