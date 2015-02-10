@@ -32,43 +32,12 @@
   when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
         and odoo_config_db_passwd is defined and odoo_config_db_passwd
 
-- name: Remote PostgreSQL - Create databases
-  delegate_to: "{{ odoo_config_db_host }}"
-  remote_user: "{{ odoo_config_db_host_user }}"
-  sudo: yes
-  sudo_user: postgres
-  postgresql_db:
-    name: "{{ item.name }}"
-    owner: "{{ odoo_config_db_user }}"
-    encoding: 'UTF-8'
-    lc_collate: "{{ item.locale}}"
-    lc_ctype: "{{ item.locale }}"
-    template: "template0"
-    state: present
-  with_items: odoo_databases
-  when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
-
-- name: Local PostgreSQL - Create databases
-  sudo: yes
-  sudo_user: postgres
-  postgresql_db:
-    name: "{{ item.name }}"
-    owner: "{{ odoo_config_db_user }}"
-    encoding: 'UTF-8'
-    lc_collate: "{{ item.locale}}"
-    lc_ctype: "{{ item.locale }}"
-    template: "template0"
-    state: present
-  with_items: odoo_databases
-  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
-
 - name: Remote PostgreSQL - Active the 'unaccent' extension on databases
   delegate_to: "{{ odoo_config_db_host }}"
   remote_user: "{{ odoo_config_db_host_user }}"
   sudo: yes
   sudo_user: postgres
-  shell: "psql {{ item.name }} -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
-  with_items: odoo_databases
+  shell: "psql template1 -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
   when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
         and odoo_config_unaccent
   changed_when: False
@@ -76,8 +45,7 @@
 - name: Local PostgreSQL - Active the 'unaccent' extension on databases
   sudo: yes
   sudo_user: postgres
-  shell: "psql {{ item.name }} -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
-  with_items: odoo_databases
+  shell: "psql template1 -c 'CREATE EXTENSION IF NOT EXISTS \"unaccent\";'"
   changed_when: False
   when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
         and odoo_config_unaccent
