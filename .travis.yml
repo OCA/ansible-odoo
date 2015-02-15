@@ -1,0 +1,28 @@
+---
+language: python
+python: "2.7"
+
+env:
+  - ODOO_VERSION=8.0 ANSIBLE_VERSION="1.8,<1.9"
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq python-apt
+
+install:
+  - pip install "ansible>=$ANSIBLE_VERSION"
+  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
+
+script:
+  # Check the role/playbook's syntax.
+  - "ansible-playbook -i tests/inventory tests/test.yml --syntax-check"
+  # Run the role/playbook with ansible-playbook.
+  - "ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e \"odoo_version=$ODOO_VERSION\""
+  # Run the role/playbook again, checking to make sure it's idempotent.
+  - >
+    ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e 'odoo_version=$ODOO_VERSION'
+    | grep -q 'changed=0.*failed=0'
+    && (echo 'IDEMPOTENCE TEST: OK' && exit 0)
+    || (echo 'IDEMPOTENCE TEST: FAILED' && exit 1)
+  - sudo service odoo status
+  - sleep 3 && wget http://localhost:8069
