@@ -9,10 +9,6 @@
   when: odoo_version|float == 8.0
 # [/ 8.0 ]
 
-- name: Set Odoo service runlevels
-  command: update-rc.d {{ odoo_service }} defaults
-  changed_when: False
-
 - name: Enable Odoo service
   service: name={{ odoo_service }} enabled=yes state=started
   when: odoo_init == True
