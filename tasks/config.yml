@@ -6,5 +6,5 @@
         owner={{ odoo_user }} group={{ odoo_user }} mode=0600
         force={{ odoo_force_config and 'yes' or 'no' }}
         backup=yes
-  when: odoo_version == 8.0
+  when: odoo_version|float == 8.0
 # [/ 8.0 ]
