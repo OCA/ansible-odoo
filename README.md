@@ -7,9 +7,74 @@ Minimum Ansible Version: 1.8
 
 ## Systems supported
 
-- Debian Wheezy (7.0)
-- Ubuntu Precise (12.04)
-- Ubuntu Trusty (14.04)
+* Debian
+    - Wheezy    (7)
+* Ubuntu
+    - Precise   (12.04)
+    - Trusty    (14.04)
+
+## Example (Playbook)
+
+Standard installation (assuming that PostgreSQL is installed and running on
+the same host):
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  sudo: yes
+  roles:
+    - odoo
+  vars:
+    - odoo_version: 8.0
+    - odoo_config_admin_passwd: SuPerPassWorD
+```
+
+Standard installation but with PostgreSQL installed on a remote host (and
+available from your Ansible inventory):
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  sudo: yes
+  roles:
+    - odoo
+  vars:
+    - odoo_version: 8.0
+    - odoo_config_admin_passwd: SuPerPassWorD
+    - odoo_config_db_host: pg_server
+    - odoo_config_db_user: odoo
+    - odoo_config_db_passwd: PaSsWoRd
+```
+
+Installation from a personnal Git repository such as your repository looks
+like this:
+
+```sh
+REPO/
+├── server              # could be a sub-repository of https://github.com/odoo/odoo
+├── addons_oca_web      # another sub-repository (https://github.com/OCA/web here)
+└── addons              # custom modules
+```
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  sudo: yes
+  roles:
+    - odoo
+  vars:
+    - odoo_version: 8.0
+    - odoo_repo_type: git
+    - odoo_repo_url: https://SERVER/REPO
+    - odoo_repo_rev: master
+    - odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
+    - odoo_config_admin_passwd: SuPerPassWorD
+    - odoo_config_addons_path:
+        - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
+        - "/home/{{ odoo_user }}/odoo/server/addons"
+        - "/home/{{ odoo_user }}/odoo/addons_oca_web"
+        - "/home/{{ odoo_user }}/odoo/addons"
+```
 
 ## Variables
 
@@ -28,7 +93,7 @@ odoo_force_config: False
 odoo_repo_type: git     # git or hg
 odoo_repo_url: https://github.com/odoo/odoo.git
 odoo_repo_dest: "{{ odoo_rootdir }}"
-odoo_repo_rev: 8.0
+odoo_repo_rev: "{{ odoo_version }}"
 odoo_repo_update: True  # Update the working copy or not. This option is
                         # ignored on the first run (a checkout of the working
                         # copy is always processed on the given revision)
@@ -92,28 +157,4 @@ odoo_config_xmlrpcs_port: 8071
 
 # Extra options
 odoo_user_sshkeys: False    # ../../path/to/public_keys/*
-```
-
-
-## Example (Playbook)
-
-```yaml
-- name: Odoo Server
-  hosts: odoo_server
-  sudo: yes
-  roles:
-    - odoo
-  vars:
-    - odoo_config_db_host: pg_server
-    - odoo_config_db_user: odoo
-    - odoo_repo_type: git
-    - odoo_repo_url: https://github.com/odoo/odoo.git
-    - odoo_repo_dest: /home/odoo/odoo/server
-    - odoo_repo_rev: 8.0
-```
-
-When deploying, you can set the passwords with the `--extra-vars` option:
-
-```sh
-$ ansible-playbook -i servers servers.yml -l odoo_server --extra-vars "odoo_user_passwd=pAssWorD odoo_config_admin_passwd=SuPerPassWorD odoo_config_db_passwd=PaSswOrd"
 ```
