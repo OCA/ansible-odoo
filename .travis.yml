@@ -20,7 +20,7 @@ script:
   - "ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e \"odoo_version=$ODOO_VERSION\""
   # Run the role/playbook again, checking to make sure it's idempotent.
   - >
-    ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e 'odoo_version=$ODOO_VERSION'
+    ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e "odoo_version=$ODOO_VERSION"
     | grep -q 'changed=0.*failed=0'
     && (echo 'IDEMPOTENCE TEST: OK' && exit 0)
     || (echo 'IDEMPOTENCE TEST: FAILED' && exit 1)
