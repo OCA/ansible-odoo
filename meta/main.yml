@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Sébastien Alix
+  description: Ansible role to install Odoo from a Git or Mercurial repository, and configure it.
+  company: OSIELL
+  license: GPLv3
+  min_ansible_version: 1.8
+  platforms:
+    - name: Debian
+      versions:
+        - wheezy
+    - name: Ubuntu
+      versions:
+        - precise
+        - trusty
+  categories:
+    - web
+dependencies: []
