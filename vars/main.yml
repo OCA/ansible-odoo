@@ -1,6 +1,7 @@
 ---
 
 odoo_required_tools:
+    - sudo
     - git
     - mercurial
     - python-pip
