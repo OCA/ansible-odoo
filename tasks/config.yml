@@ -7,4 +7,5 @@
         force={{ odoo_force_config and 'yes' or 'no' }}
         backup=yes
   when: odoo_version|float == 8.0
+  notify: Restart Odoo
 # [/ 8.0 ]

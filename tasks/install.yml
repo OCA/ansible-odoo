@@ -49,6 +49,7 @@
         revision={{ odoo_repo_rev }}
   when: odoo_repo_type == 'hg' and odoo_repo_url
         and (odoo_repo_update or (project_path.stat.exists == False))
+  notify: Restart Odoo
   tags:
     - odoo_project
 
@@ -61,6 +62,7 @@
         update={{ project_path.stat.exists == False and 'yes'
                   or (odoo_repo_update and 'yes' or 'no') }}
   when: odoo_repo_type == 'git' and odoo_repo_url
+  notify: Restart Odoo
   tags:
     - odoo_project
 

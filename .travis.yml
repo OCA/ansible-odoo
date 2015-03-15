@@ -18,11 +18,19 @@ script:
   - "ansible-playbook -i tests/inventory tests/test.yml --syntax-check"
   # Run the role/playbook with ansible-playbook.
   - "ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e \"odoo_version=$ODOO_VERSION\""
+  - sudo service odoo status
   # Run the role/playbook again, checking to make sure it's idempotent.
   - >
     ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e "odoo_version=$ODOO_VERSION"
     | grep -q 'changed=0.*failed=0'
     && (echo 'IDEMPOTENCE TEST: OK' && exit 0)
     || (echo 'IDEMPOTENCE TEST: FAILED' && exit 1)
+  - sudo service odoo status
+  # Run the role/playbook again but change the configuration, and check if the service restart
+  - >
+    ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e "odoo_version=$ODOO_VERSION odoo_config_workers=4 odoo_force_config=1"
+    | grep -q 'changed=2.*failed=0'
+    && (echo 'RESTART TEST: OK' && exit 0)
+    || (echo 'RESTART TEST: FAILED' && exit 1)
   - sudo service odoo status
   - sleep 3 && wget http://localhost:8069
