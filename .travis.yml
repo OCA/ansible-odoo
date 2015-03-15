@@ -28,7 +28,7 @@ script:
   - sudo service odoo status
   # Run the role/playbook again but change the configuration, and check if the service restart
   - >
-    ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e "odoo_version=$ODOO_VERSION odoo_config_workers=4 odoo_force_config=1"
+    ansible-playbook -i tests/inventory tests/test.yml --connection=local --sudo -e "odoo_version=$ODOO_VERSION odoo_config_workers=4"
     | grep -q 'changed=2.*failed=0'
     && (echo 'RESTART TEST: OK' && exit 0)
     || (echo 'RESTART TEST: FAILED' && exit 1)
