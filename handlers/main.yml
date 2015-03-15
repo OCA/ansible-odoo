@@ -1,0 +1,7 @@
+---
+
+- name: Restart Odoo
+  service:
+    name: "{{ odoo_service }}"
+    state: restarted
+  when: odoo_init == True

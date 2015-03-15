@@ -14,5 +14,5 @@
   when: odoo_init == True
 
 - name: Disable Odoo service
-  service: name={{ odoo_service }} enabled=no
+  service: name={{ odoo_service }} enabled=no state=stopped
   when: odoo_init == False
