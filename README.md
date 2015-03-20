@@ -154,6 +154,10 @@ odoo_config_xmlrpc_port: 8069
 odoo_config_xmlrpcs: True
 odoo_config_xmlrpcs_interface: ''
 odoo_config_xmlrpcs_port: 8071
+# Custom configuration options
+odoo_config_custom: {}
+    #your_option1: value1
+    #your_option2: value2
 
 # Extra options
 odoo_user_sshkeys: False    # ../../path/to/public_keys/*
