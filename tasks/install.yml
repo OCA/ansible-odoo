@@ -61,6 +61,7 @@
         version={{ odoo_repo_rev }}
         update={{ project_path.stat.exists == False and 'yes'
                   or (odoo_repo_update and 'yes' or 'no') }}
+        depth={{ odoo_repo_depth }}
   when: odoo_repo_type == 'git' and odoo_repo_url
   notify: Restart Odoo
   tags:
