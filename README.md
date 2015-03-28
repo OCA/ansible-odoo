@@ -98,6 +98,8 @@ odoo_repo_update: True  # Update the working copy or not. This option is
                         # ignored on the first run (a checkout of the working
                         # copy is always processed on the given revision)
                         # WARNING: uncommited changes will be discarded!
+odoo_repo_depth: 1      # Set to 0 to clone the full history
+                        # (option not supported with hg repository)
 
 # Odoo parameters
 odoo_config_addons_path:
