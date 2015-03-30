@@ -5,6 +5,11 @@
     - odoo
     - odoo_install
 
+- include: wkhtmltox.yml
+  tags:
+    - odoo
+    - odoo_wkhtmltox
+
 - include: config.yml
   tags:
     - odoo
