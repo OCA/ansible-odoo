@@ -4,6 +4,7 @@ python: "2.7"
 
 env:
   - ODOO_VERSION=8.0 ANSIBLE_VERSION="1.8,<1.9"
+  - ODOO_VERSION=8.0 ANSIBLE_VERSION="1.9,<2"
 
 before_install:
   - sudo apt-get update -qq
