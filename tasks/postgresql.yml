@@ -6,6 +6,7 @@
   postgresql_user: name={{ odoo_config_db_user }}
                    role_attr_flags=CREATEDB,NOSUPERUSER
   when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
+        and odoo_postgresql_set_user
 
 - name: Local PostgreSQL - Add the Odoo user
   sudo: yes
@@ -13,6 +14,7 @@
   postgresql_user: name={{ odoo_config_db_user }}
                    role_attr_flags=CREATEDB,NOSUPERUSER
   when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
+        and odoo_postgresql_set_user
 
 - name: Remote PostgreSQL - Set the Odoo user password
   delegate_to: "{{ odoo_config_db_host }}"
@@ -23,6 +25,7 @@
                    password={{ odoo_config_db_passwd }}
   when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
         and odoo_config_db_passwd is defined and odoo_config_db_passwd
+        and odoo_postgresql_set_user
 
 - name: Local PostgreSQL - Set the Odoo user password
   sudo: yes
@@ -31,6 +34,7 @@
                    password={{ odoo_config_db_passwd }}
   when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
         and odoo_config_db_passwd is defined and odoo_config_db_passwd
+        and odoo_postgresql_set_user
 
 - name: Remote PostgreSQL - Active the 'unaccent' extension on databases
   delegate_to: "{{ odoo_config_db_host }}"
@@ -42,6 +46,7 @@
   changed_when: "'already exists' not in create_extension.stderr"
   when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
         and odoo_config_unaccent
+        and odoo_postgresql_active_unaccent
 
 - name: Local PostgreSQL - Active the 'unaccent' extension on databases
   sudo: yes
@@ -51,3 +56,4 @@
   changed_when: "'already exists' not in create_extension.stderr"
   when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
         and odoo_config_unaccent
+        and odoo_postgresql_active_unaccent
