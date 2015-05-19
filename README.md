@@ -105,6 +105,10 @@ odoo_wkhtmltox_version: 0.12.2.1    # Download URLs available in the
                                     # 'odoo_wkhtmltox_urls' variable
                                     # (see 'vars/main.yml')
 
+# Tasks related to PostgreSQL
+odoo_postgresql_set_user: True
+odoo_postgresql_active_unaccent: True
+
 # Odoo parameters
 odoo_config_addons_path:
     - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
