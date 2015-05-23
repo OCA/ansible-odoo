@@ -58,7 +58,13 @@ odoo_wkhtmltox_depends:     # Taken from the debian package
     - libfreetype6
     - libpng12-0
     - zlib1g
-    - "{{ {'Debian': 'libjpeg8', 'Ubuntu': 'libjpeg-turbo8'}[ansible_distribution] }}"
+    - "{{ {
+            'squeeze': 'libjpeg8',
+            'wheezy': 'libjpeg8',
+            'jessie': 'libjpeg62-turbo',
+            'precise': 'libjpeg-turbo8',
+            'trusty': 'libjpeg-turbo8',
+        }[ansible_distribution_release] }}"
     - libssl1.0.0
     - libx11-6
     - libxext6
