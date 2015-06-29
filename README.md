@@ -101,7 +101,7 @@ odoo_repo_update: True  # Update the working copy or not. This option is
                         # WARNING: uncommited changes will be discarded!
 odoo_repo_depth: 1      # Set to 0 to clone the full history
                         # (option not supported with hg repository)
-odoo_wkhtmltox_version: 0.12.2.1    # Download URLs available in the
+odoo_wkhtmltox_version: 0.12.1      # Download URLs available in the
                                     # 'odoo_wkhtmltox_urls' variable
                                     # (see 'vars/main.yml')
 
