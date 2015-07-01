@@ -10,6 +10,11 @@
     - odoo
     - odoo_wkhtmltox
 
+- include: reportlab.yml
+  tags:
+    - odoo
+    - odoo_reportlab
+
 - include: config.yml
   tags:
     - odoo
