@@ -104,6 +104,7 @@ odoo_repo_depth: 1      # Set to 0 to clone the full history
 odoo_wkhtmltox_version: 0.12.1      # Download URLs available in the
                                     # 'odoo_wkhtmltox_urls' variable
                                     # (see 'vars/main.yml')
+odoo_reportlab_font_url: http://www.reportlab.com/ftp/pfbfer.zip
 
 # Tasks related to PostgreSQL
 odoo_postgresql_set_user: True
