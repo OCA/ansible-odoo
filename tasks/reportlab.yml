@@ -1,0 +1,20 @@
+---
+# Download and install the barcode fonts from ReportLab
+- name: Download the ReportLab barcode fonts
+  get_url: url="{{ odoo_reportlab_font_url }}"
+           dest="/root/pfbfer.zip"
+
+- name: Create the font directory
+  file: path="/home/{{ odoo_user }}/fonts" state=directory
+
+- name: Install unzip
+  apt: name=unzip state=installed
+
+- name: Unzip the ReportLab fonts
+  unarchive: src="/root/pfbfer.zip"
+             dest="/home/{{ odoo_user }}/fonts"
+             owner={{ odoo_user }}
+             group={{ odoo_user }}
+             mode="u=rwX,go=rX"
+             copy=No
+             creates="/home/{{ odoo_user }}/fonts/_abi____.pfb"
