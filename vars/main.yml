@@ -47,8 +47,7 @@ odoo_pypi_packages:
     - psycogreen
 
 odoo_wkhtmltox_urls:
-    - http://sourceforge.net/projects/wkhtmltopdf/files/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
-    - http://sourceforge.net/projects/wkhtmltopdf/files/archive/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
+    - http://download.gna.org/wkhtmltopdf/0.12/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
     - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
 
 odoo_wkhtmltox_dest: "/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb"
