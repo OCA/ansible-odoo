@@ -24,12 +24,18 @@ LOGFILE={{ odoo_logdir }}/{{ odoo_service }}.log
 PIDFILE=/var/run/${NAME}.pid
 USER={{ odoo_user }}
 export LOGNAME=$USER
+{% if odoo_init_env %}
+# Custom environment variables
+{% for name, value in odoo_init_env.iteritems() %}
+export {{ name }}={{ value }}
+{% endfor %}
+{% endif %}
 
 test -x $DAEMON || exit 0
 set -e
 
 function _start() {
-    start-stop-daemon --chdir=${WORKDIR} --start --quiet --pidfile $PIDFILE --chuid $USER:$USER --background --make-pidfile --exec $DAEMON -- --config $CONFIG --logfile $LOGFILE
+    start-stop-daemon --chdir=${WORKDIR} --start --quiet --pidfile $PIDFILE --chuid $USER:$USER --background --make-pidfile --exec $DAEMON -- --config $CONFIG --logfile $LOGFILE{{ odoo_config_server_wide_modules not in [False, 'None', ''] and ' --load=%s' % odoo_config_server_wide_modules or '' }}
 }
 
 function _stop() {
