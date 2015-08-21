@@ -54,8 +54,11 @@ like this:
 REPO/
 ├── server              # could be a sub-repository of https://github.com/odoo/odoo
 ├── addons_oca_web      # another sub-repository (https://github.com/OCA/web here)
+├── addons_oca_connector    # yet another sub-repository (https://github.com/OCA/connector)
 └── addons              # custom modules
 ```
+
+Here we set some options required by the ``connector`` framework:
 
 ```yaml
 - name: Odoo
@@ -69,12 +72,17 @@ REPO/
     - odoo_repo_url: https://SERVER/REPO
     - odoo_repo_rev: master
     - odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
+    - odoo_init_env:
+        ODOO_CONNECTOR_CHANNELS: root:2
     - odoo_config_admin_passwd: SuPerPassWorD
     - odoo_config_addons_path:
         - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
         - "/home/{{ odoo_user }}/odoo/server/addons"
         - "/home/{{ odoo_user }}/odoo/addons_oca_web"
+        - "/home/{{ odoo_user }}/odoo/addons_oca_connector"
         - "/home/{{ odoo_user }}/odoo/addons"
+    odoo_config_server_wide_modules: web,web_kanban,connector
+    odoo_config_workers: 8
 ```
 
 ## Variables
@@ -89,6 +97,9 @@ odoo_logdir: "/var/log/{{ odoo_user }}"
 odoo_workdir: "/home/{{ odoo_user }}/odoo"
 odoo_rootdir: "/home/{{ odoo_user }}/odoo/server"
 odoo_init: True
+odoo_init_env: {}
+    #VAR1: value1
+    #VAR2: value2
 odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
 odoo_force_config: True
 odoo_repo_type: git     # git or hg
