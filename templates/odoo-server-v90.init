@@ -1,0 +1,81 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          {{ odoo_service }}
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Should-Start:      $network
+# Should-Stop:       $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start odoo daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+## more info: http://wiki.debian.org/LSBInitScripts
+
+. /lib/lsb/init-functions
+
+PATH=/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin
+WORKDIR={{ odoo_workdir }}
+DAEMON={{ odoo_rootdir }}/odoo.py
+NAME={{ odoo_service }}
+DESC={{ odoo_service }}
+CONFIG={{ odoo_config_file }}
+LOGFILE={{ odoo_logdir }}/{{ odoo_service }}.log
+PIDFILE=/var/run/${NAME}.pid
+USER={{ odoo_user }}
+export LOGNAME=$USER
+{% if odoo_init_env %}
+# Custom environment variables
+{% for name, value in odoo_init_env.iteritems() %}
+export {{ name }}={{ value }}
+{% endfor %}
+{% endif %}
+
+test -x $DAEMON || exit 0
+set -e
+
+function _start() {
+    start-stop-daemon --chdir=${WORKDIR} --start --quiet --pidfile $PIDFILE --chuid $USER:$USER --background --make-pidfile --exec $DAEMON -- --config $CONFIG --logfile $LOGFILE{{ odoo_config_server_wide_modules not in [False, 'None', ''] and ' --load=%s' % odoo_config_server_wide_modules or '' }}
+}
+
+function _stop() {
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE --oknodo --retry 3
+    rm -f $PIDFILE
+}
+
+function _status() {
+    start-stop-daemon --status --quiet --pidfile $PIDFILE
+    return $?
+}
+
+
+case "$1" in
+        start)
+                echo -n "Starting $DESC: "
+                _start
+                echo "ok"
+                ;;
+        stop)
+                echo -n "Stopping $DESC: "
+                _stop
+                echo "ok"
+                ;;
+        restart|force-reload)
+                echo -n "Restarting $DESC: "
+                _stop
+                sleep 1
+                _start
+                echo "ok"
+                ;;
+        status)
+                echo -n "Status of $DESC: "
+                _status && echo "running" || echo "stopped"
+                ;;
+        *)
+                N=/etc/init.d/$NAME
+                echo "Usage: $N {start|stop|restart|force-reload|status}" >&2
+                exit 1
+                ;;
+esac
+
+exit 0
