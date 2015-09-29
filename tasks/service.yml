@@ -9,6 +9,15 @@
   when: odoo_version|float == 8.0
 # [/ 8.0 ]
 
+# [ 9.0 ]
+- name: Copy Odoo init script (9.0)
+  template: src=odoo-server-v90.init dest=/etc/init.d/{{ odoo_service }}
+        owner=root group=root mode=0755
+        force={{ odoo_force_config and 'yes' or 'no' }}
+        backup=yes
+  when: odoo_version|float == 9.0
+# [/ 9.0 ]
+
 - name: Enable Odoo service
   service: name={{ odoo_service }} enabled=yes state=started
   when: odoo_init == True
