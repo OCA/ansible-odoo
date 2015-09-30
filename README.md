@@ -5,7 +5,12 @@ and configure it.
 
 Minimum Ansible Version: 1.8
 
-## Systems supported
+## Supported versions
+
+* 8.0
+* 9.0
+
+## Supported systems
 
 * Debian
     - Wheezy    (7)
