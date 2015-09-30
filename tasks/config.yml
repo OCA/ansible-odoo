@@ -1,21 +1,8 @@
 ---
 
-# [ 8.0 ]
-- name: Copy Odoo configuration file (8.0)
-  template: src=odoo-server-v80.conf dest={{ odoo_config_file }}
+- name: Generate Odoo configuration file
+  template: src=odoo-{{ odoo_version }}.conf dest={{ odoo_config_file }}
         owner={{ odoo_user }} group={{ odoo_user }} mode=0600
         force={{ odoo_force_config and 'yes' or 'no' }}
         backup=yes
-  when: odoo_version|float == 8.0
   notify: Restart Odoo
-# [/ 8.0 ]
-
-# [ 9.0 ]
-- name: Copy Odoo configuration file (9.0)
-  template: src=odoo-server-v90.conf dest={{ odoo_config_file }}
-        owner={{ odoo_user }} group={{ odoo_user }} mode=0600
-        force={{ odoo_force_config and 'yes' or 'no' }}
-        backup=yes
-  when: odoo_version|float == 9.0
-  notify: Restart Odoo
-# [/ 9.0 ]
