@@ -16,8 +16,12 @@
   tags:
     - odoo_packages
 
+- stat: path=/usr/bin/node
+  register: node_executable
+
 - name: Add symlink '/usr/bin/node' for nodejs
   file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
+  when: node_executable.stat.exists == False
   tags:
     - odoo_packages
 
