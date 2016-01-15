@@ -16,6 +16,20 @@
   tags:
     - odoo_packages
 
+- name: Add symlink '/usr/bin/node' for nodejs
+  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
+  tags:
+    - odoo_packages
+
+- name: Install less compiler for theme
+  npm:  name={{ item }}
+        global=yes
+  with_items:
+    - less
+    - less-plugin-clean-css
+  tags:
+    - odoo_packages
+
 - name: Install Odoo dependencies (PyPi)
   pip: name={{ item }}
   with_items: odoo_pypi_packages
