@@ -7,6 +7,8 @@ odoo_required_tools:
     - python-pip
 
 odoo_debian_packages:
+    - nodejs
+    - npm
     - python-dev
     - python-psycopg2
     - python-simplejson
