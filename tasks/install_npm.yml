@@ -1,0 +1,19 @@
+---
+
+- name: Check that '/usr/bin/nodejs' exists
+  stat: path=/usr/bin/nodejs
+  register: nodejs_executable
+
+- name: Check that '/usr/local/bin/node' exists
+  stat: path=/usr/local/bin/node
+  register: node_executable
+
+- name: Add symlink '/usr/local/bin/node'
+  file: src=/usr/bin/nodejs dest=/usr/local/bin/node state=link
+  when: nodejs_executable.stat.exists and node_executable.stat.exists == False
+
+- name: Install Odoo dependencies (npm)
+  npm:  name={{ item.name }}
+        version={{ item.version }}
+        global=yes
+  with_items: odoo_npm_packages
