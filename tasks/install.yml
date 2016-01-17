@@ -46,7 +46,7 @@
   sudo_user: "{{ odoo_user }}"
   hg:   repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
-        revision={{ odoo_repo_rev }}
+        revision={{ odoo_repo_rev | string }}
   when: odoo_repo_type == 'hg' and odoo_repo_url
         and (odoo_repo_update or (project_path.stat.exists == False))
   notify: Restart Odoo
@@ -58,7 +58,7 @@
   sudo_user: "{{ odoo_user }}"
   git:  repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
-        version={{ odoo_repo_rev }}
+        version={{ odoo_repo_rev | string }}
         update={{ project_path.stat.exists == False and 'yes'
                   or (odoo_repo_update and 'yes' or 'no') }}
         depth={{ odoo_repo_depth }}
