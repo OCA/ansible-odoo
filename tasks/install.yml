@@ -22,6 +22,13 @@
   tags:
     - odoo_packages
 
+- name: Install Odoo dependencies (npm)
+  include: install_npm.yml
+  when: (odoo_version | int) >= 9
+  tags:
+    - odoo
+    - odoo_packages
+
 - name: Add Odoo system user
   user: name={{ odoo_user }} shell=/bin/bash
         password={{ odoo_user_passwd }} update_password=on_create

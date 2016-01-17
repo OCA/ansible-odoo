@@ -1,0 +1,6 @@
+---
+
+odoo_wkhtmltox_depends_dist:
+    - libjpeg62-turbo
+
+odoo_wkhtmltox_depends: "{{ odoo_wkhtmltox_depends_common + odoo_wkhtmltox_depends_dist }}"
