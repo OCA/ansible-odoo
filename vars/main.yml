@@ -6,68 +6,24 @@ odoo_required_tools:
     - mercurial
     - python-pip
 
-odoo_debian_packages:
-    - python-dev
-    - python-psycopg2
-    - python-simplejson
-    - python-lxml
-    - python-tz
-    - python-imaging
-    - python-yaml
-    - python-reportlab
-    - python-mako
-    - python-pychart
-    - python-werkzeug
-    - python-dateutil
-    - python-unittest2
-    - python-mock
-    - python-openid
-    - python-docutils
-    - python-feedparser
-    - python-gdata
-    - python-jinja2
-    - python-psutil
-    - python-pydot
-    - python-webdav
-    - python-vatnumber
-    - python-vobject
-    - python-xlwt
-    - python-ldap
-    - python-openssl
-    - python-egenix-mxdatetime
-    - python-zsi
-    - python-requests
-    - python-pypdf
-    - python-decorator
-    - python-passlib
-    - python-babel
-    - python-gevent
-
 odoo_pypi_packages:
     - psycogreen
 
-odoo_wkhtmltox_urls:
-    - http://download.gna.org/wkhtmltopdf/0.12/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
-    - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
-
-odoo_wkhtmltox_dest: "/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb"
-
-odoo_wkhtmltox_depends:     # Taken from the debian package
+odoo_wkhtmltox_depends_common:
     - fontconfig
     - libfontconfig1
     - libfreetype6
     - libpng12-0
     - zlib1g
-    - "{{ {
-            'squeeze': 'libjpeg8',
-            'wheezy': 'libjpeg8',
-            'jessie': 'libjpeg62-turbo',
-            'precise': 'libjpeg-turbo8',
-            'trusty': 'libjpeg-turbo8',
-        }[ansible_distribution_release] }}"
     - libssl1.0.0
     - libx11-6
     - libxext6
     - libxrender1
     - libstdc++6
     - libc6
+
+odoo_wkhtmltox_urls:
+    - http://download.gna.org/wkhtmltopdf/0.12/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
+    - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
+
+odoo_wkhtmltox_dest: "/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb"

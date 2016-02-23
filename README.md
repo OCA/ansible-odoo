@@ -5,19 +5,14 @@ and configure it.
 
 Minimum Ansible Version: 1.9
 
-## Supported versions
+## Supported versions and systems
 
-* 8.0
-* 9.0
-
-## Supported systems
-
-* Debian
-    - Wheezy    (7)
-    - Jessie    (8)
-* Ubuntu
-    - Precise   (12.04)
-    - Trusty    (14.04)
+| System / Odoo | 8.0 | 9.0 |
+|---------------|-----|-----|
+| Debian 7      | yes |  -  |
+| Debian 8      | yes | yes |
+| Ubuntu 12.04  | yes |  -  |
+| Ubuntu 14.04  | yes | yes |
 
 ## Example (Playbook)
 
