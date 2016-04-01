@@ -20,6 +20,13 @@
     - odoo
     - odoo_install
 
+- include: install_extra.yml
+  when: odoo_user_sshkeys is defined and odoo_user_sshkeys
+  tags:
+    - odoo
+    - odoo_install
+    - odoo_install_extra
+
 - include: wkhtmltox.yml
   tags:
     - odoo
@@ -35,10 +42,19 @@
     - odoo
     - odoo_config
 
-- include: postgresql.yml
+- include: postgresql_local.yml
+  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
   tags:
     - odoo
     - odoo_postgresql
+    - odoo_postgresql_local
+
+- include: postgresql_remote.yml
+  when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
+  tags:
+    - odoo
+    - odoo_postgresql
+    - odoo_postgresql_remote
 
 - include: service.yml
   tags:
