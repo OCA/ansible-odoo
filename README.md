@@ -3,7 +3,7 @@
 Ansible role to install Odoo from a Git or Mercurial repository,
 and configure it.
 
-Minimum Ansible Version: 1.9
+Minimum Ansible Version: 2.0
 
 ## Supported versions and systems
 
