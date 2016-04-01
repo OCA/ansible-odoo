@@ -77,7 +77,7 @@ odoo_config_smtp_ssl: False
 odoo_config_smtp_user: False
 odoo_config_syslog: False
 odoo_config_timezone: False
-odoo_config_translate_modules: ['all']
+odoo_config_translate_modules: "['all']"
 odoo_config_unaccent: False
 odoo_config_without_demo: False
 odoo_config_workers: 0

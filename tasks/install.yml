@@ -4,7 +4,7 @@
   apt:  pkg={{ item }}
         state=installed
         update_cache=yes
-  with_items: odoo_required_tools
+  with_items: "{{ odoo_required_tools }}"
   tags:
     - odoo_required_tools
 
@@ -12,13 +12,13 @@
   apt:  pkg={{ item }}
         state=installed
         update_cache=yes
-  with_items: odoo_debian_packages
+  with_items: "{{ odoo_debian_packages }}"
   tags:
     - odoo_packages
 
 - name: Install Odoo dependencies (PyPi)
   pip: name={{ item }}
-  with_items: odoo_pypi_packages
+  with_items: "{{ odoo_pypi_packages }}"
   tags:
     - odoo_packages
 
