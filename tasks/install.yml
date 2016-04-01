@@ -49,8 +49,8 @@
     - odoo_project
 
 - name: Clone project repository (Mercurial)
-  sudo: yes
-  sudo_user: "{{ odoo_user }}"
+  become: yes
+  become_user: "{{ odoo_user }}"
   hg:   repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
         revision={{ odoo_repo_rev | string }}
@@ -61,8 +61,8 @@
     - odoo_project
 
 - name: Clone project repository (Git)
-  sudo: yes
-  sudo_user: "{{ odoo_user }}"
+  become: yes
+  become_user: "{{ odoo_user }}"
   git:  repo={{ odoo_repo_url }}
         dest={{ odoo_repo_dest }}
         version={{ odoo_repo_rev | string }}
@@ -73,12 +73,3 @@
   notify: Restart Odoo
   tags:
     - odoo_project
-
-- name: Set SSH public keys for the Odoo user
-  authorized_key: user={{ odoo_user }}
-                  key="{{ lookup('file', item) }}"
-  with_fileglob:
-    - "{{ odoo_user_sshkeys }}"
-  when: odoo_user_sshkeys is defined and odoo_user_sshkeys
-  tags:
-    - odoo_ssh

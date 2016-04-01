@@ -20,6 +20,13 @@
     - odoo
     - odoo_install
 
+- include: install_extra.yml
+  when: odoo_user_sshkeys is defined and odoo_user_sshkeys
+  tags:
+    - odoo
+    - odoo_install
+    - odoo_install_extra
+
 - include: wkhtmltox.yml
   tags:
     - odoo
