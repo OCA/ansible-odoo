@@ -25,4 +25,5 @@
 
 - name: Install wkhtmltox
   apt:  deb="/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb"
+        force=yes
   when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists
