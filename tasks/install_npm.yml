@@ -1,5 +1,10 @@
 ---
 
+- name: Install npm
+  apt:  pkg=npm
+        state=installed
+        update_cache=yes
+
 - name: Check that '/usr/bin/nodejs' exists
   stat: path=/usr/bin/nodejs
   register: nodejs_executable
