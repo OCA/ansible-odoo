@@ -21,4 +21,4 @@
   npm:  name={{ item.name }}
         version={{ item.version }}
         global=yes
-  with_items: odoo_npm_packages
+  with_items: "{{ odoo_npm_packages | default([]) }}"

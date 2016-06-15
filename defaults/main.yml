@@ -12,17 +12,6 @@ odoo_logdir: "/var/log/{{ odoo_user }}"
 odoo_workdir: "/home/{{ odoo_user }}/odoo"
 odoo_rootdir: "{{ odoo_install_type == 'buildout' and '/home/'+odoo_user+'/odoo/parts/odoo' or '/home/'+odoo_user+'/odoo/server' }}"
 
-# Standard installation options (odoo_install_type == 'standard')
-odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
-odoo_force_config: True
-
-# Buildout installation options (odoo_install_type == 'buildout')
-odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
-odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
-odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"
-odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
-odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
-
 # Project repository to deploy
 odoo_repo_type: git     # git or hg
 odoo_repo_url: "{{ odoo_install_type == 'buildout' and 'https://github.com/osiell/odoo-buildout-example.git' or 'https://github.com/odoo/odoo.git' }}"
@@ -46,7 +35,9 @@ odoo_postgresql_set_user: True
 odoo_postgresql_user_role_attr: CREATEDB,NOSUPERUSER
 odoo_postgresql_active_unaccent: True
 
-# Configuration options (odoo_install_type == 'standard')
+# Standard installation/configuration options (odoo_install_type == 'standard')
+odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
+odoo_force_config: True
 odoo_config_addons_path:
     - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
     - "/home/{{ odoo_user }}/odoo/server/addons"
@@ -105,6 +96,13 @@ odoo_config_xmlrpcs_port: 8071
 odoo_config_custom: {}
     #your_option1: value1
     #your_option2: value2
+
+# Buildout installation options (odoo_install_type == 'buildout')
+odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
+odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
+odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"
+odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
+odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
 
 # Extra options
 odoo_user_sshkeys: False    # ../../path/to/public_keys/*
