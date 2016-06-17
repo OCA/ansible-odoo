@@ -1,5 +1,10 @@
 ---
 
+- name: Install npm
+  apt:  pkg=npm
+        state=installed
+        update_cache=yes
+
 - name: Check that '/usr/bin/nodejs' exists
   stat: path=/usr/bin/nodejs
   register: nodejs_executable
@@ -16,4 +21,4 @@
   npm:  name={{ item.name }}
         version={{ item.version }}
         global=yes
-  with_items: odoo_npm_packages
+  with_items: "{{ odoo_npm_packages | default([]) }}"

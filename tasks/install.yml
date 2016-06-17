@@ -8,27 +8,6 @@
   tags:
     - odoo_required_tools
 
-- name: Install Odoo dependencies
-  apt:  pkg={{ item }}
-        state=installed
-        update_cache=yes
-  with_items: "{{ odoo_debian_packages }}"
-  tags:
-    - odoo_packages
-
-- name: Install Odoo dependencies (PyPi)
-  pip: name={{ item }}
-  with_items: "{{ odoo_pypi_packages }}"
-  tags:
-    - odoo_packages
-
-- name: Install Odoo dependencies (npm)
-  include: install_npm.yml
-  when: (odoo_version | int) >= 9
-  tags:
-    - odoo
-    - odoo_packages
-
 - name: Add Odoo system user
   user: name={{ odoo_user }} shell=/bin/bash
         password={{ odoo_user_passwd }} update_password=on_create
@@ -73,3 +52,27 @@
   notify: Restart Odoo
   tags:
     - odoo_project
+
+- name: Standard installation
+  include: install_standard.yml
+  when: odoo_install_type == 'standard'
+  tags:
+    - odoo_install_type_standard
+
+- name: Buildout installation
+  include: install_buildout.yml
+  when: odoo_install_type == 'buildout'
+  tags:
+    - odoo_install_type_buildout
+
+- name: Install NPM packages
+  include: install_npm.yml
+  when: (odoo_version | int) >= 9
+  tags:
+    - odoo
+    - odoo_packages
+
+- include: install_extra.yml
+  when: odoo_user_sshkeys is defined and odoo_user_sshkeys
+  tags:
+    - odoo_install_extra

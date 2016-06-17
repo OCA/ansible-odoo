@@ -1,11 +1,5 @@
 ---
 
-- name: Generate Odoo init script
-  template: src=odoo-{{ odoo_version }}.init dest=/etc/init.d/{{ odoo_service }}
-        owner=root group=root mode=0755
-        force={{ odoo_force_config and 'yes' or 'no' }}
-        backup=yes
-
 - name: Enable Odoo service
   service: name={{ odoo_service }} enabled=yes state=started
   when: odoo_init == True

@@ -1,0 +1,9 @@
+---
+
+- hosts: localhost
+  become: yes
+  roles:
+    - ansible-odoo
+  vars:
+    odoo_install_type: buildout
+    odoo_service: odoo-buildout
