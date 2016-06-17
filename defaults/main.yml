@@ -1,20 +1,21 @@
-odoo_service: odoo
+odoo_install_type: standard     # standard, buildout
 odoo_version: 8.0
+odoo_service: odoo
 odoo_user: odoo
 odoo_user_passwd: odoo
 odoo_user_system: False
-odoo_logdir: "/var/log/{{ odoo_user }}"
-odoo_workdir: "/home/{{ odoo_user }}/odoo"
-odoo_rootdir: "/home/{{ odoo_user }}/odoo/server"
 odoo_init: True
 odoo_init_env: {}
     #VAR1: value1
     #VAR2: value2
-odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
-odoo_force_config: True
+odoo_logdir: "/var/log/{{ odoo_user }}"
+odoo_workdir: "/home/{{ odoo_user }}/odoo"
+odoo_rootdir: "{{ odoo_install_type == 'buildout' and '/home/'+odoo_user+'/odoo/parts/odoo' or '/home/'+odoo_user+'/odoo/server' }}"
+
+# Project repository to deploy
 odoo_repo_type: git     # git or hg
-odoo_repo_url: https://github.com/odoo/odoo.git
-odoo_repo_dest: "{{ odoo_rootdir }}"
+odoo_repo_url: "{{ odoo_install_type == 'buildout' and 'https://github.com/osiell/odoo-buildout-example.git' or 'https://github.com/odoo/odoo.git' }}"
+odoo_repo_dest: "{{ odoo_install_type == 'buildout' and odoo_workdir or odoo_rootdir }}"
 odoo_repo_rev: "{{ odoo_version }}"
 odoo_repo_update: True  # Update the working copy or not. This option is
                         # ignored on the first run (a checkout of the working
@@ -22,6 +23,8 @@ odoo_repo_update: True  # Update the working copy or not. This option is
                         # WARNING: uncommited changes will be discarded!
 odoo_repo_depth: 1      # Set to 0 to clone the full history (slower)
                         # (this option is not supported with hg)
+
+# Third party programs options
 odoo_wkhtmltox_version: 0.12.1      # Download URLs available in the
                                     # 'odoo_wkhtmltox_urls' variable
                                     # (see 'vars/main.yml')
@@ -32,7 +35,9 @@ odoo_postgresql_set_user: True
 odoo_postgresql_user_role_attr: CREATEDB,NOSUPERUSER
 odoo_postgresql_active_unaccent: True
 
-# Configuration options
+# Standard installation/configuration options (odoo_install_type == 'standard')
+odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
+odoo_force_config: True
 odoo_config_addons_path:
     - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
     - "/home/{{ odoo_user }}/odoo/server/addons"
@@ -91,6 +96,13 @@ odoo_config_xmlrpcs_port: 8071
 odoo_config_custom: {}
     #your_option1: value1
     #your_option2: value2
+
+# Buildout installation options (odoo_install_type == 'buildout')
+odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
+odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
+odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"
+odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
+odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
 
 # Extra options
 odoo_user_sshkeys: False    # ../../path/to/public_keys/*

@@ -1,5 +1,7 @@
 ---
 
+odoo_buildout_venv_cmd: "virtualenv {{ odoo_buildout_venv_path }} && {{ odoo_buildout_venv_path }}/bin/python -c \"import setuptools\" && {{ odoo_buildout_venv_path }}/bin/pip uninstall setuptools -y"
+
 odoo_wkhtmltox_depends_dist:
     - libjpeg8
 

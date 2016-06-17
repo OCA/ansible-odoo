@@ -3,9 +3,25 @@
 Ansible role to install Odoo from a Git or Mercurial repository,
 and configure it.
 
+This role supports two types of installation:
+
+* **standard**: install the Odoo dependencies from APT repositories and the
+Odoo project from a Git/Hg repository. Odoo is configured with Ansible options
+(`odoo_config_*` ones).
+
+* **buildout**: build the Odoo project from a Git/Hg repository containing a
+Buildout configuration file based on the
+[anybox.recipe.odoo](https://pypi.python.org/pypi/anybox.recipe.odoo/) recipe.
+Odoo and its dependencies are then installed and executed inside a Python
+virtual environment. The configuration part is also managed by Buildout
+(`odoo_config_*` options are not used excepting the `odoo_config_db_*` ones
+for PostgreSQL related tasks).
+
 Minimum Ansible Version: 2.0
 
 ## Supported versions and systems
+
+### Standard (odoo_install_type: standard)
 
 | System / Odoo | 8.0 | 9.0 |
 |---------------|-----|-----|
@@ -13,8 +29,16 @@ Minimum Ansible Version: 2.0
 | Debian 8      | yes | yes |
 | Ubuntu 12.04  | yes |  -  |
 | Ubuntu 14.04  | yes | yes |
+| Ubuntu 16.04  | yes | yes |
+
+### Buildout (odoo_install_type: buildout)
+
+You only need a Debian-based system, all the stuff is then handled by Buildout
+to run Odoo >= 8.0.
 
 ## Example (Playbook)
+
+### odoo_install_type: standard (default)
 
 Standard installation (assuming that PostgreSQL is installed and running on
 the same host):
@@ -22,7 +46,7 @@ the same host):
 ```yaml
 - name: Odoo
   hosts: odoo_server
-  sudo: yes
+  become: yes
   roles:
     - odoo
   vars:
@@ -30,13 +54,16 @@ the same host):
     - odoo_config_admin_passwd: SuPerPassWorD
 ```
 
+With the standard installation type you configure Odoo with the available
+`odoo_config_*` options.
+
 Standard installation but with PostgreSQL installed on a remote host (and
 available from your Ansible inventory):
 
 ```yaml
 - name: Odoo
   hosts: odoo_server
-  sudo: yes
+  become: yes
   roles:
     - odoo
   vars:
@@ -47,8 +74,8 @@ available from your Ansible inventory):
     - odoo_config_db_passwd: PaSsWoRd
 ```
 
-Installation from a personnal Git repository such as your repository looks
-like this:
+Standard installation from a personnal Git repository such as your repository
+looks like this:
 
 ```sh
 REPO/
@@ -63,7 +90,7 @@ Here we set some options required by the ``connector`` framework:
 ```yaml
 - name: Odoo
   hosts: odoo_server
-  sudo: yes
+  become: yes
   roles:
     - odoo
   vars:
@@ -85,102 +112,82 @@ Here we set some options required by the ``connector`` framework:
     odoo_config_workers: 8
 ```
 
-## Variables
+### odoo_install_type: buildout
+
+With a Buildout installation type, Odoo is installed and configured directly
+by Buildout:
 
 ```yaml
-odoo_service: odoo
-odoo_version: 8.0
-odoo_user: odoo
-odoo_user_passwd: odoo
-odoo_user_system: False
-odoo_logdir: "/var/log/{{ odoo_user }}"
-odoo_workdir: "/home/{{ odoo_user }}/odoo"
-odoo_rootdir: "/home/{{ odoo_user }}/odoo/server"
-odoo_init: True
-odoo_init_env: {}
-    #VAR1: value1
-    #VAR2: value2
-odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
-odoo_force_config: True
-odoo_repo_type: git     # git or hg
-odoo_repo_url: https://github.com/odoo/odoo.git
-odoo_repo_dest: "{{ odoo_rootdir }}"
-odoo_repo_rev: "{{ odoo_version }}"
-odoo_repo_update: True  # Update the working copy or not. This option is
-                        # ignored on the first run (a checkout of the working
-                        # copy is always processed on the given revision)
-                        # WARNING: uncommited changes will be discarded!
-odoo_repo_depth: 1      # Set to 0 to clone the full history
-                        # (option not supported with hg repository)
-odoo_wkhtmltox_version: 0.12.1      # Download URLs available in the
-                                    # 'odoo_wkhtmltox_urls' variable
-                                    # (see 'vars/main.yml')
-odoo_reportlab_font_url: http://www.reportlab.com/ftp/pfbfer.zip
-
-# Tasks related to PostgreSQL
-odoo_postgresql_set_user: True
-odoo_postgresql_active_unaccent: True
-
-# Odoo parameters
-odoo_config_addons_path:
-    - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
-    - "/home/{{ odoo_user }}/odoo/server/addons"
-odoo_config_admin_passwd: admin
-odoo_config_auto_reload: False
-odoo_config_csv_internal_sep: ','
-odoo_config_data_dir: "/home/{{ odoo_user }}/.local/share/Odoo"
-odoo_config_db_host: False
-odoo_config_db_host_user: "{{ ansible_ssh_user }}"
-odoo_config_db_maxconn: 64
-odoo_config_db_name: False
-odoo_config_db_passwd: False
-odoo_config_db_port: False
-odoo_config_db_template: template1
-odoo_config_db_user: odoo
-odoo_config_dbfilter: '.*'
-odoo_config_debug_mode: False
-odoo_config_pidfile: None
-odoo_config_proxy_mode: False
-odoo_config_email_from: False
-odoo_config_geoip_database: /usr/share/GeoIP/GeoLiteCity.dat
-odoo_config_limit_memory_hard: 805306368
-odoo_config_limit_memory_soft: 671088640
-odoo_config_limit_time_cpu: 60
-odoo_config_limit_time_real: 120
-odoo_config_list_db: True
-odoo_config_log_db: False
-odoo_config_log_level: info
-odoo_config_logfile: None
-odoo_config_logrotate: False
-odoo_config_longpolling_port: 8072
-odoo_config_osv_memory_age_limit: 1.0
-odoo_config_osv_memory_count_limit: False
-odoo_config_max_cron_threads: 2
-odoo_config_secure_cert_file: server.cert
-odoo_config_secure_pkey_file: server.pkey
-odoo_config_server_wide_modules: None
-odoo_config_smtp_password: False
-odoo_config_smtp_port: 25
-odoo_config_smtp_server: localhost
-odoo_config_smtp_ssl: False
-odoo_config_smtp_user: False
-odoo_config_syslog: False
-odoo_config_timezone: False
-odoo_config_translate_modules: ['all']
-odoo_config_unaccent: False
-odoo_config_without_demo: False
-odoo_config_workers: 0
-odoo_config_xmlrpc: True
-odoo_config_xmlrpc_interface: ''
-odoo_config_xmlrpc_port: 8069
-odoo_config_xmlrpcs: True
-odoo_config_xmlrpcs_interface: ''
-odoo_config_xmlrpcs_port: 8071
-# Custom configuration options
-odoo_config_custom: {}
-    #your_option1: value1
-    #your_option2: value2
-
-# Extra options
-odoo_user_sshkeys: False    # ../../path/to/public_keys/*
+- name: Odoo
+  hosts: odoo_server
+  become: yes
+  roles:
+    - odoo
+  vars:
+    - odoo_install_type: buildout
+    - odoo_version: 8.0
+    - odoo_repo_type: git
+    - odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
+    - odoo_repo_rev: "{{ odoo_version }}"
+    - odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
 ```
+
+The same but with PostgreSQL installed on a remote host (and available from
+your Ansible inventory):
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  become: yes
+  roles:
+    - odoo
+  vars:
+    - odoo_install_type: buildout
+    - odoo_version: 8.0
+    - odoo_repo_type: git
+    - odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
+    - odoo_repo_rev: "{{ odoo_version }}"
+    - odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
+    - odoo_config_db_host: pg_server
+    - odoo_config_db_user: odoo
+    - odoo_config_db_passwd: PaSsWoRd
+```
+
+By default Ansible is looking for a `bootstrap.py` script and a `buildout.cfg`
+file at the root of the cloned repository to call Buildout, but you can change
+that to point to your own files. Assuming your repository looks like this:
+
+```sh
+REPO/
+├── addons              # custom modules
+├── bin
+│   └── bootstrap.py
+├── builtout.cfg
+├── builtout.dev.cfg
+├── builtout.prod.cfg
+└── builtout.test.cfg
+```
+
+We just set the relevant options to tell Ansible the files to use with the
+`odoo_buildout_*` options:
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  become: yes
+  roles:
+    - odoo
+  vars:
+    - odoo_install_type: buildout
+    - odoo_version: 8.0
+    - odoo_repo_type: git
+    - odoo_repo_url: https://SERVER/REPO
+    - odoo_repo_rev: master
+    - odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
+    - odoo_buildout_bootstrap_path: "/home/{{ odoo_user }}/odoo/bin/bootstrap.py"
+    - odoo_buildout_config_path: "/home/{{ odoo_user }}/odoo/buildout.prod.cfg"
+```
+
+## Variables
+
+See the [defaults/main.yml](defaults/main.yml) file.

@@ -36,7 +36,6 @@ odoo_debian_packages:
     - python-passlib
     - python-babel
     - python-gevent
-    - npm
 
 odoo_npm_packages:
     - name: less
