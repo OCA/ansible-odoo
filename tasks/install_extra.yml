@@ -1,9 +1,18 @@
 ---
 
-- name: Set SSH public keys for the Odoo user
-  authorized_key: user={{ odoo_user }}
-                  key="{{ lookup('file', item) }}"
-  with_fileglob:
-    - "{{ odoo_user_sshkeys }}"
+# Use a block so that the when clause gets evaluated for the whole
+# statement not every individual item within it
+- name: Set SSH Keys
+  set_fact:
+    sshkeys: "{{ odoo_user_sshkeys }}"
+
+- block:
+
+    - name: Set SSH public keys for the Odoo user
+      authorized_key: user={{ odoo_user }}
+                      key="{{ lookup('file', item) }}"
+      with_fileglob:
+        - "{{ sshkeys }}"
+  when: sshkeys is defined and sshkeys != False
   tags:
     - odoo_ssh
