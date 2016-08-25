@@ -1,18 +1,11 @@
 ---
 
-# Use a block so that the when clause gets evaluated for the whole
-# statement not every individual item within it
-- name: Set SSH Keys
-  set_fact:
-    sshkeys: "{{ odoo_user_sshkeys }}"
+- name: Read SSH Keys
+  local_action:
+    shell cat {{ odoo_user_sshkeys }}
+  register: all_ssh_keys
 
-- block:
-
-    - name: Set SSH public keys for the Odoo user
-      authorized_key: user={{ odoo_user }}
-                      key="{{ lookup('file', item) }}"
-      with_fileglob:
-        - "{{ sshkeys }}"
-  when: sshkeys is defined and sshkeys != False
-  tags:
-    - odoo_ssh
+- name: Set SSH public keys for the Odoo user
+  authorized_key: user={{ odoo_user }}
+                  key="{{ all_ssh_keys.stdout }}"
+  when: all_ssh_keys.stdout
