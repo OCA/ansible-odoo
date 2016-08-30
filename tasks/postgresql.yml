@@ -18,7 +18,7 @@
       when: odoo_postgresql_active_unaccent
 
   # delegate_to: "{{ odoo_config_db_host if odoo_config_db_host not in [False, 'localhost', '127.0.0.1'] else omit }}"
-  delegate_to: "{{ odoo_config_db_host if ((odoo_config_db_host|bool) != False) else ansible_host }}"
+  delegate_to: "{{ odoo_config_db_host if ((odoo_config_db_host|bool) != False) else ansible_ssh_host }}"
   remote_user: "{{ odoo_config_db_host_user if ((odoo_config_db_host|bool) != False) else ansible_user }}"
   become: yes
   become_user: postgres
