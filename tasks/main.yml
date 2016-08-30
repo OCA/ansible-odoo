@@ -30,19 +30,10 @@
     - odoo
     - odoo_reportlab
 
-- include: postgresql_local.yml
-  when: odoo_config_db_host in [False, 'localhost', '127.0.0.1']
+- include: postgresql.yml
   tags:
     - odoo
     - odoo_postgresql
-    - odoo_postgresql_local
-
-- include: postgresql_remote.yml
-  when: odoo_config_db_host not in [False, 'localhost', '127.0.0.1']
-  tags:
-    - odoo
-    - odoo_postgresql
-    - odoo_postgresql_remote
 
 - include: service.yml
   tags:
