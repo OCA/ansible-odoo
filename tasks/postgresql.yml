@@ -1,0 +1,24 @@
+---
+
+- block:
+
+    - name: PostgreSQL - Add the Odoo user
+      postgresql_user: name={{ odoo_config_db_user }}
+                       role_attr_flags={{ odoo_postgresql_user_role_attr }}
+      when: odoo_postgresql_set_user
+
+    - name: PostgreSQL - Set the Odoo user password
+      postgresql_user: name={{ odoo_config_db_user }}
+                       password={{ odoo_config_db_passwd }}
+      when: odoo_config_db_passwd is defined and odoo_config_db_passwd
+            and odoo_postgresql_set_user
+
+    - name: PostgreSQL - Activate the 'unaccent' extension on databases
+      postgresql_ext: name=unaccent db=template1
+      when: odoo_postgresql_active_unaccent
+
+  # delegate_to: "{{ odoo_config_db_host if odoo_config_db_host not in [False, 'localhost', '127.0.0.1'] else omit }}"
+  delegate_to: "{{ odoo_config_db_host if ((odoo_config_db_host|bool) != False) else ansible_host }}"
+  remote_user: "{{ odoo_config_db_host_user if ((odoo_config_db_host|bool) != False) else ansible_user }}"
+  become: yes
+  become_user: postgres
