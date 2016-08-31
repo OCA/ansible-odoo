@@ -1,5 +1,8 @@
 ---
 
+- name: Show if ansible_host is available
+  debug var=ansible_host
+
 - block:
 
     - name: PostgreSQL - Add the Odoo user
