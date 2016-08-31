@@ -1,7 +1,7 @@
 ---
 
 - name: Show if ansible_host is available
-  debug var=ansible_host
+  debug: var=ansible_host
 
 - block:
 
