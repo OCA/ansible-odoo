@@ -9,8 +9,12 @@ odoo_buildout_build_dependencies:
     - libpq-dev
     - libldap2-dev
     - libsasl2-dev
-    - libopenjpeg-dev
+    - libopenjp2-7-dev
     - libjpeg-turbo8-dev
+    - libtiff5-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
 
 odoo_wkhtmltox_depends_dist:
     - libjpeg-turbo8
