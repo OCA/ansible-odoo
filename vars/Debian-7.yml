@@ -13,6 +13,9 @@ odoo_buildout_build_dependencies:
     - libsasl2-dev
     - libopenjpeg-dev
     - libjpeg8-dev
+    - libtiff5-dev
+    - libfreetype6-dev
+    - liblcms2-dev
 
 odoo_wkhtmltox_depends_dist:
     - libjpeg8
