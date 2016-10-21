@@ -34,7 +34,11 @@ test -x $DAEMON || exit 0
 set -e
 
 function _start() {
-    start-stop-daemon --chdir=${WORKDIR} --start --quiet --pidfile $PIDFILE --chuid $USER:$USER --background --make-pidfile --exec $DAEMON -- --logfile $LOGFILE
+    # '--load' is used here as Odoo ignores the 'server_wide_modules' option
+    # from the configuration file
+    #   Odoo: https://github.com/odoo/odoo/pull/13685
+	#   OCB:  https://github.com/OCA/OCB/pull/553
+    start-stop-daemon --chdir=${WORKDIR} --start --quiet --pidfile $PIDFILE --chuid $USER:$USER --background --make-pidfile --exec $DAEMON -- --logfile $LOGFILE{{ odoo_config_server_wide_modules not in [False, 'None', ''] and ' --load=%s' % odoo_config_server_wide_modules or '' }}
 }
 
 function _stop() {
