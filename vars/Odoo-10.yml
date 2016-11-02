@@ -1,0 +1,49 @@
+---
+
+odoo_debian_packages:
+    - python-dev
+    - python-openssl
+    - python-markupsafe
+    - python-serial
+    - python-usb
+    - python-qrcode
+    # Dependencies taken from the deb package
+    - python-babel
+    - python-dateutil
+    - python-decorator
+    - python-docutils
+    - python-feedparser
+    - python-gevent
+    - python-greenlet
+    - python-imaging
+    - python-jinja2
+    - python-ldap
+    - python-libxslt1
+    - python-lxml
+    - python-mako
+    - python-mock
+    - python-openid
+    - python-passlib
+    - python-psutil
+    - python-psycopg2
+    - python-pychart
+    - python-pydot
+    - python-pyparsing
+    - python-pypdf
+    - python-reportlab
+    - python-requests
+    - python-six
+    - python-suds
+    - python-tz
+    - python-vatnumber
+    - python-vobject
+    - python-werkzeug
+    - python-xlsxwriter
+    - python-xlwt
+    - python-yaml
+
+odoo_npm_packages:
+    - name: less
+      version: 2.5.3
+    - name: less-plugin-clean-css
+      version: 1.5.1
