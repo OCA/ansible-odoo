@@ -54,7 +54,7 @@ odoo_config_db_port: False
 odoo_config_db_template: template1
 odoo_config_db_user: odoo
 odoo_config_dbfilter: '.*'
-odoo_config_debug_mode: False
+odoo_config_debug_mode: False           # <= 9.0
 odoo_config_pidfile: None
 odoo_config_proxy_mode: False
 odoo_config_email_from: False
@@ -63,6 +63,7 @@ odoo_config_limit_memory_hard: 805306368
 odoo_config_limit_memory_soft: 671088640
 odoo_config_limit_time_cpu: 60
 odoo_config_limit_time_real: 120
+odoo_config_limit_time_real_cron: -1    # >= 10.0
 odoo_config_list_db: True
 odoo_config_log_db: False
 odoo_config_log_level: info

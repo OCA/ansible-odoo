@@ -23,5 +23,4 @@
         owner=root group=root mode=0755
         force={{ odoo_force_config and 'yes' or 'no' }}
         backup=yes
-  when: odoo_init == True
   notify: Restart Odoo

@@ -23,13 +23,13 @@ Minimum Ansible Version: 2.0
 
 ### Standard (odoo_install_type: standard)
 
-| System / Odoo | 8.0 | 9.0 |
-|---------------|-----|-----|
-| Debian 7      | yes |  -  |
-| Debian 8      | yes | yes |
-| Ubuntu 12.04  | yes |  -  |
-| Ubuntu 14.04  | yes | yes |
-| Ubuntu 16.04  | yes | yes |
+| System / Odoo | 8.0 | 9.0 | 10.0 |
+|---------------|-----|-----|------|
+| Debian 7      | yes |  -  |  -   |
+| Debian 8      | yes | yes | yes  |
+| Ubuntu 12.04  | yes |  -  |  -   |
+| Ubuntu 14.04  | yes | yes | yes  |
+| Ubuntu 16.04  | yes | yes | yes  |
 
 ### Buildout (odoo_install_type: buildout)
 
@@ -50,7 +50,7 @@ the same host):
   roles:
     - odoo
   vars:
-    - odoo_version: 8.0
+    - odoo_version: 10.0
     - odoo_config_admin_passwd: SuPerPassWorD
 ```
 
@@ -67,7 +67,7 @@ available from your Ansible inventory):
   roles:
     - odoo
   vars:
-    - odoo_version: 8.0
+    - odoo_version: 10.0
     - odoo_config_admin_passwd: SuPerPassWorD
     - odoo_config_db_host: pg_server
     - odoo_config_db_user: odoo
@@ -94,7 +94,7 @@ Here we set some options required by the ``connector`` framework:
   roles:
     - odoo
   vars:
-    - odoo_version: 8.0
+    - odoo_version: 10.0
     - odoo_repo_type: git
     - odoo_repo_url: https://SERVER/REPO
     - odoo_repo_rev: master
@@ -125,7 +125,7 @@ by Buildout:
     - odoo
   vars:
     - odoo_install_type: buildout
-    - odoo_version: 8.0
+    - odoo_version: 10.0
     - odoo_repo_type: git
     - odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
     - odoo_repo_rev: "{{ odoo_version }}"
@@ -143,7 +143,7 @@ your Ansible inventory):
     - odoo
   vars:
     - odoo_install_type: buildout
-    - odoo_version: 8.0
+    - odoo_version: 10.0
     - odoo_repo_type: git
     - odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
     - odoo_repo_rev: "{{ odoo_version }}"
@@ -179,7 +179,7 @@ We just set the relevant options to tell Ansible the files to use with the
     - odoo
   vars:
     - odoo_install_type: buildout
-    - odoo_version: 8.0
+    - odoo_version: 10.0
     - odoo_repo_type: git
     - odoo_repo_url: https://SERVER/REPO
     - odoo_repo_rev: master
