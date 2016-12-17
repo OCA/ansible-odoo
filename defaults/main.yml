@@ -106,4 +106,4 @@ odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
 odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
 
 # Extra options
-odoo_user_sshkeys: False    # ../../path/to/public_keys/*
+odoo_user_sshkeys: ""       # ../../path/to/public_keys/*
