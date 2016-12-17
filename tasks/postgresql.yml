@@ -1,5 +1,10 @@
 ---
 
+- name: Delegate PostgreSQL tasks to the relevant host
+  set_fact:
+    odoo_postgresql_delegate_to: "{{ odoo_config_db_host if ((odoo_config_db_host|bool) != False) else ansible_host }}"
+    odoo_postgresql_remote_user: "{{ odoo_config_db_host_user if ((odoo_config_db_host|bool) != False) else ansible_user }}"
+
 - block:
 
     - name: PostgreSQL - Add the Odoo user
@@ -17,8 +22,7 @@
       postgresql_ext: name=unaccent db=template1
       when: odoo_postgresql_active_unaccent
 
-  # delegate_to: "{{ odoo_config_db_host if odoo_config_db_host not in [False, 'localhost', '127.0.0.1'] else omit }}"
-  delegate_to: "{{ odoo_config_db_host if ((odoo_config_db_host|bool) != False) else ansible_host }}"
-  remote_user: "{{ odoo_config_db_host_user if ((odoo_config_db_host|bool) != False) else ansible_user }}"
+  delegate_to: "{{ odoo_postgresql_delegate_to }}"
+  remote_user: "{{ odoo_postgresql_remote_user }}"
   become: yes
   become_user: postgres
