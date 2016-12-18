@@ -46,7 +46,7 @@ odoo_config_auto_reload: False
 odoo_config_csv_internal_sep: ','
 odoo_config_data_dir: "/home/{{ odoo_user }}/.local/share/Odoo"
 odoo_config_db_host: False
-odoo_config_db_host_user: "{{ ansible_ssh_user }}"
+odoo_config_db_host_user: "{{ ansible_user }}"
 odoo_config_db_maxconn: 64
 odoo_config_db_name: False
 odoo_config_db_passwd: False
