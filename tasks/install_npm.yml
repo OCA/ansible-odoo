@@ -3,7 +3,8 @@
 - name: Install npm
   apt:  pkg=npm
         state=installed
-        update_cache=yes
+        update_cache={{ odoo_apt_update_cache }}
+        cache_valid_time={{ odoo_apt_cache_valid_time }}
 
 - name: Check that '/usr/bin/nodejs' exists
   stat: path=/usr/bin/nodejs

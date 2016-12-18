@@ -1,5 +1,8 @@
 ---
 
+odoo_apt_update_cache: yes
+odoo_apt_cache_valid_time: 86400
+
 odoo_required_tools:
     - sudo
     - git
