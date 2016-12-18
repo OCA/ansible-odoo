@@ -3,7 +3,8 @@
 - name: Install Odoo dependencies
   apt:  pkg={{ item }}
         state=installed
-        update_cache=yes
+        update_cache={{ odoo_apt_update_cache }}
+        cache_valid_time={{ odoo_apt_cache_valid_time }}
   with_items: "{{ odoo_debian_packages }}"
   tags:
     - odoo_packages
