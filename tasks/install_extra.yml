@@ -1,9 +1,11 @@
 ---
 
+- name: Read SSH Keys
+  local_action:
+    shell cat {{ odoo_user_sshkeys }}
+  register: all_ssh_keys
+
 - name: Set SSH public keys for the Odoo user
   authorized_key: user={{ odoo_user }}
-                  key="{{ lookup('file', item) }}"
-  with_fileglob:
-    - "{{ odoo_user_sshkeys }}"
-  tags:
-    - odoo_ssh
+                  key="{{ all_ssh_keys.stdout }}"
+  when: all_ssh_keys.stdout
