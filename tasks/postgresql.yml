@@ -2,7 +2,7 @@
 
 - name: Delegate PostgreSQL tasks to the relevant host
   set_fact:
-    odoo_postgresql_delegate_to: "{{ odoo_config_db_host if ((odoo_config_db_host|bool) != False) else ansible_host }}"
+    odoo_postgresql_delegate_to: "{{ odoo_config_db_host if ((odoo_config_db_host|bool) != False) else inventory_hostname }}"
     odoo_postgresql_remote_user: "{{ odoo_config_db_host_user if ((odoo_config_db_host|bool) != False) else ansible_user }}"
 
 - block:
