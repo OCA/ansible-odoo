@@ -104,6 +104,8 @@ odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
 odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"
 odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
 odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
+odoo_buildout_extra_dependencies: []    # Extra Debian packages required
+                                        # to run your Buildout recipe
 
 # Extra options
 odoo_user_sshkeys: ""       # ../../path/to/public_keys/*
