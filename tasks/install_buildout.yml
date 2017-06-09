@@ -7,6 +7,13 @@
         cache_valid_time={{ odoo_apt_cache_valid_time }}
   with_items: "{{ odoo_buildout_build_dependencies }}"
 
+- name: Install extra dependencies
+  apt:  pkg={{ item }}
+        state=installed
+        update_cache={{ odoo_apt_update_cache }}
+        cache_valid_time={{ odoo_apt_cache_valid_time }}
+  with_items: "{{ odoo_buildout_extra_dependencies }}"
+
 - name: Prepare the Python virtual environment
   become: yes
   become_user: "{{ odoo_user }}"
