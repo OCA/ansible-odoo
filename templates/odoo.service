@@ -1,0 +1,12 @@
+[Unit]
+Description=odoo
+After=network.target
+
+[Service]
+Type=simple
+User={{ odoo_user }}
+WorkingDirectory={{ odoo_workdir }}
+ExectStart={{ odoo_buildout_bin_path }} --logfile {{ odoo_logdir }}/{{ odoo_service }}.log
+
+[Install]
+WantedBy=multi-user.target
