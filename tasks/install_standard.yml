@@ -18,10 +18,3 @@
 - import_tasks: config.yml
   tags:
     - odoo_config
-
-- name: Generate Odoo init script
-  template: src=odoo-{{ odoo_version }}.init dest=/etc/init.d/{{ odoo_service }}
-        owner=root group=root mode=0755
-        force={{ odoo_force_config and 'yes' or 'no' }}
-        backup=yes
-  notify: Restart Odoo
