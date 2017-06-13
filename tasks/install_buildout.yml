@@ -43,4 +43,13 @@
         owner=root group=root mode=0755
         force=yes
         backup=yes
+  when: ansible_service_mgr == 'sysvinit'
+  notify: Restart Odoo
+
+- name: Generate systemd Odoo service
+  template: src=odoo.service dest=/etc/systemd/system
+        owner=root group=root mode=0755
+        force=yes
+        backup=yes
+  when: ansible_service_mgr == 'systemd'
   notify: Restart Odoo
