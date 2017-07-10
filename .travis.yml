@@ -28,7 +28,6 @@ before_install:
 
 install:
   - pip install "ansible>=$ANSIBLE_VERSION"
-  - "{ echo '[defaults]'; echo 'roles_path = ../'; } >> ansible.cfg"
 
 script:
   - ./tests/run.sh
