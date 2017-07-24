@@ -37,19 +37,3 @@
   become_user: "{{ odoo_user }}"
   command: "{{ odoo_buildout_bin_path }} -c {{ odoo_buildout_config_path }}"
   changed_when: False
-
-- name: Generate Odoo init script
-  template: src=odoo-buildout.init dest=/etc/init.d/{{ odoo_service }}
-        owner=root group=root mode=0755
-        force=yes
-        backup=yes
-  when: ansible_service_mgr == 'sysvinit'
-  notify: Restart Odoo
-
-- name: Generate systemd Odoo service
-  template: src=odoo.service dest=/etc/systemd/system
-        owner=root group=root mode=0755
-        force=yes
-        backup=yes
-  when: ansible_service_mgr == 'systemd'
-  notify: Restart Odoo
