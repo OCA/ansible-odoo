@@ -1,5 +1,23 @@
 ---
 
+- name: Generate Odoo init script
+  template: src=odoo-buildout.init dest=/etc/init.d/{{ odoo_service }}
+        owner=root group=root mode=0755
+        force=yes
+        backup=yes
+  when: ansible_service_mgr != 'systemd' and odoo_install_type == 'buildout'
+  notify: Restart Odoo
+
+- name: Generate systemd Odoo service
+  template:
+        src=odoo-buildout.service
+        dest=/etc/systemd/system/{{ odoo_service }}.service
+        owner=root group=root mode=0755
+        force=yes
+        backup=yes
+  when: ansible_service_mgr == 'systemd' and odoo_install_type == 'buildout'
+  notify: Restart Odoo
+
 - name: Enable Odoo service
   service: name={{ odoo_service }} enabled=yes state=started
   when: odoo_init == True
