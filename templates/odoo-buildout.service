@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User={{ odoo_user }}
 WorkingDirectory={{ odoo_workdir }}
-ExecStart={{ odoo_buildout_odoo_bin_path }} --logfile {{ odoo_logdir }}/{{ odoo_service }}.log
+ExecStart={{ odoo_buildout_odoo_bin_path }}
 {% for name, value in odoo_init_env.iteritems() %}
 Environment={{ name }}={{ value }}
 {% endfor %}
