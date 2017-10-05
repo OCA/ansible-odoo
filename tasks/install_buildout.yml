@@ -28,7 +28,7 @@
 - name: Install buildout (run the bootstrap.py script)
   become: yes
   become_user: "{{ odoo_user }}"
-  command: "{{ odoo_buildout_venv_path }}/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }}"
+  command: "{{ odoo_buildout_bootstrap_cmd }}"
   args:
     creates: "{{ odoo_buildout_bin_path }}"
 
