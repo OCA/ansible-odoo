@@ -15,19 +15,6 @@ odoo_pypi_packages:
 
 odoo_buildout_venv_cmd: "virtualenv --no-setuptools {{ odoo_buildout_venv_path }}"
 
-odoo_wkhtmltox_depends_common:
-    - fontconfig
-    - libfontconfig1
-    - libfreetype6
-    - libpng12-0
-    - zlib1g
-    - libssl1.0.0
-    - libx11-6
-    - libxext6
-    - libxrender1
-    - libstdc++6
-    - libc6
-
 odoo_wkhtmltox_urls:
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
     - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb

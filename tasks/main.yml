@@ -1,17 +1,9 @@
 ---
 
-- name: Setting variables depending on the Odoo version
+- name: Set variables depending on the platform and the version of Odoo
   include_vars: "{{ item }}"
   with_first_found:
-    - "../vars/Odoo-{{ odoo_version | int }}.yml"
-  tags:
-    - always
-
-- name: Setting variables depending on the distribution release
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}.yml"
-    - "../vars/{{ ansible_distribution }}.yml"
+    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}_Odoo-{{ odoo_version | int }}.yml"
   tags:
     - always
 
