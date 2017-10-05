@@ -99,8 +99,10 @@ odoo_config_custom: {}
     #your_option2: value2
 
 # Buildout installation options (odoo_install_type == 'buildout')
+odoo_buildout_version: 2.9.5
 odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
 odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
+odoo_buildout_bootstrap_cmd: "{{ odoo_buildout_venv_path }}/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }} --buildout-version {{ odoo_buildout_version }}"
 odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"
 odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
 odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
