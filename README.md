@@ -21,18 +21,11 @@ Minimum Ansible Version: 2.4
 
 ## Supported versions and systems
 
-### Standard (odoo_install_type: standard)
-
 | System / Odoo | 8.0 | 9.0 | 10.0 |
 |---------------|-----|-----|------|
 | Debian 8      | yes | yes | yes  |
 | Ubuntu 14.04  | yes | yes | yes  |
 | Ubuntu 16.04  | yes | yes | yes  |
-
-### Buildout (odoo_install_type: buildout)
-
-You only need a Debian-based system, all the stuff is then handled by Buildout
-to run Odoo >= 8.0.
 
 ## Example (Playbook)
 
