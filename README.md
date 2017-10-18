@@ -25,6 +25,7 @@ Minimum Ansible Version: 2.4
 |---------------|-----|-----|------|
 | Debian 7      | yes |  -  |  -   |
 | Debian 8      | yes | yes | yes  |
+| Debian 9      | yes | yes | yes  |
 | Ubuntu 12.04  | yes |  -  |  -   |
 | Ubuntu 14.04  | yes | yes | yes  |
 | Ubuntu 16.04  | yes | yes | yes  |
