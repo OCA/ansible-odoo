@@ -17,7 +17,7 @@ virtual environment. The configuration part is also managed by Buildout
 (`odoo_config_*` options are not used excepting the `odoo_config_db_*` ones
 for PostgreSQL related tasks).
 
-Minimum Ansible Version: 2.1
+Minimum Ansible Version: 2.4
 
 ## Supported versions and systems
 

@@ -15,7 +15,7 @@
   tags:
     - odoo_packages
 
-- include: config.yml
+- import_tasks: config.yml
   tags:
     - odoo_config
 

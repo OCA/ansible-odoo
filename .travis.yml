@@ -5,52 +5,34 @@ dist: trusty
 env:
   # Debian 8 (jessie)
   #     Odoo 8.0
-  - IMAGE="images:debian/jessie" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="images:debian/jessie" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="images:debian/jessie" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   #     Odoo 9.0
-  - IMAGE="images:debian/jessie" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="images:debian/jessie" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="images:debian/jessie" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   #     Odoo 10.0
-  - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   # Ubuntu 14.04 (trusty)
   #     Odoo 8.0
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="ubuntu:trusty" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:trusty" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   #     Odoo 9.0
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="ubuntu:trusty" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:trusty" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   #     Odoo 10.0
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="ubuntu:trusty" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="ubuntu:trusty" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:trusty" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   # Ubuntu 16.04 (xenial)
   #     Odoo 8.0
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="ubuntu:xenial" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:xenial" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   #     Odoo 9.0
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="ubuntu:xenial" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:xenial" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   #     Odoo 10.0
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.1,<2.2"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.2,<2.3"
-  - IMAGE="ubuntu:xenial" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.2,<2.3"
+  - IMAGE="ubuntu:xenial" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:xenial" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
 
 install:
   # Spawn a LXD container

@@ -55,25 +55,25 @@
     - odoo_project
 
 - name: Standard installation
-  include: install_standard.yml
+  import_tasks: install_standard.yml
   when: odoo_install_type == 'standard'
   tags:
     - odoo_install_type_standard
 
 - name: Buildout installation
-  include: install_buildout.yml
+  import_tasks: install_buildout.yml
   when: odoo_install_type == 'buildout'
   tags:
     - odoo_install_type_buildout
 
 - name: Install NPM packages
-  include: install_npm.yml
+  import_tasks: install_npm.yml
   when: (odoo_version | int) >= 9
   tags:
     - odoo
     - odoo_packages
 
-- include: install_extra.yml
+- import_tasks: install_extra.yml
   when: odoo_user_sshkeys is defined and odoo_user_sshkeys
   tags:
     - odoo_install_extra
