@@ -7,27 +7,27 @@
   tags:
     - always
 
-- include: install.yml
+- import_tasks: install.yml
   tags:
     - odoo
     - odoo_install
 
-- include: wkhtmltox.yml
+- import_tasks: wkhtmltox.yml
   tags:
     - odoo
     - odoo_wkhtmltox
 
-- include: reportlab.yml
+- import_tasks: reportlab.yml
   tags:
     - odoo
     - odoo_reportlab
 
-- include: postgresql.yml
+- import_tasks: postgresql.yml
   tags:
     - odoo
     - odoo_postgresql
 
-- include: service.yml
+- import_tasks: service.yml
   tags:
     - odoo
     - odoo_service
