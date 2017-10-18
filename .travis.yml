@@ -13,6 +13,16 @@ env:
   #     Odoo 10.0
   - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
   - IMAGE="images:debian/jessie" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
+  # Debian 9 (stretch)
+  #     Odoo 8.0
+  - IMAGE="images:debian/stretch" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="images:debian/stretch" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
+  #     Odoo 9.0
+  - IMAGE="images:debian/stretch" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="images:debian/stretch" ODOO_VERSION=9.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
+  #     Odoo 10.0
+  - IMAGE="images:debian/stretch" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="images:debian/stretch" ODOO_VERSION=10.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   # Ubuntu 14.04 (trusty)
   #     Odoo 8.0
   - IMAGE="ubuntu:trusty" ODOO_VERSION=8.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
