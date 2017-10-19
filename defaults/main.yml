@@ -39,7 +39,7 @@ odoo_postgresql_active_unaccent: True
 odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
 odoo_force_config: True
 odoo_config_addons_path:
-    - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
+    - "/home/{{ odoo_user }}/odoo/server/{{ (odoo_version | int) < 9 and 'openerp' or 'odoo' }}/addons"
     - "/home/{{ odoo_user }}/odoo/server/addons"
 odoo_config_admin_passwd: admin
 odoo_config_auto_reload: False
