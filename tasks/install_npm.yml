@@ -1,22 +1,21 @@
 ---
 
-- name: Install npm
-  apt:  pkg=npm
+- name: Configure NodeJS APT repository signing key
+  apt_key:
+    url: "{{ item.url }}"
+    state: "{{ item.state }}"
+  with_items: "{{ odoo_nodejs_apt_keys | default([]) }}"
+
+- name: Configure NodeJS APT repository
+  apt_repository:
+    repo: "{{ item.repo }}"
+    state: "{{ item.state }}"
+  with_items: "{{ odoo_nodejs_apt_repositories | default([]) }}"
+
+- name: Install NodeJS
+  apt:  pkg="{{ odoo_nodejs_apt_package }}"
         state=installed
-        update_cache={{ odoo_apt_update_cache }}
-        cache_valid_time={{ odoo_apt_cache_valid_time }}
-
-- name: Check that '/usr/bin/nodejs' exists
-  stat: path=/usr/bin/nodejs
-  register: nodejs_executable
-
-- name: Check that '/usr/local/bin/node' exists
-  stat: path=/usr/local/bin/node
-  register: node_executable
-
-- name: Add symlink '/usr/local/bin/node'
-  file: src=/usr/bin/nodejs dest=/usr/local/bin/node state=link
-  when: nodejs_executable.stat.exists and node_executable.stat.exists == False
+        update_cache=yes
 
 - name: Install Odoo dependencies (npm)
   npm:  name={{ item.name }}

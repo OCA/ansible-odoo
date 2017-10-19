@@ -20,3 +20,14 @@ odoo_wkhtmltox_urls:
     - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
 
 odoo_wkhtmltox_dest: "/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb"
+
+# == NodeJS + npm ==
+odoo_nodejs_apt_package: "nodejs=0.10*"
+odoo_nodejs_apt_repo: "node_0.10"
+odoo_nodejs_apt_dist: "{{ ansible_distribution_release }}"
+odoo_nodejs_apt_repositories:
+    - repo: "deb http://deb.nodesource.com/{{ odoo_nodejs_apt_repo }} {{ odoo_nodejs_apt_dist }} main"
+      state: present
+odoo_nodejs_apt_keys:
+    - url: http://deb.nodesource.com/gpgkey/nodesource.gpg.key
+      state: present
