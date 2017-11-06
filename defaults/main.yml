@@ -1,3 +1,5 @@
+ansible_ssh_pipelining: true
+
 odoo_install_type: standard     # standard, buildout
 odoo_version: 8.0
 odoo_service: odoo
