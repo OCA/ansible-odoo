@@ -35,7 +35,8 @@ odoo_reportlab_font_url: http://www.reportlab.com/ftp/pfbfer.zip
 # Tasks related to PostgreSQL
 odoo_postgresql_set_user: True
 odoo_postgresql_user_role_attr: CREATEDB,NOSUPERUSER
-odoo_postgresql_active_unaccent: True
+odoo_postgresql_extensions:
+    - unaccent
 
 # Standard installation/configuration options (odoo_install_type == 'standard')
 odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
