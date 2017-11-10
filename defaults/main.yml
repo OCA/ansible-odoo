@@ -1,3 +1,5 @@
+ansible_ssh_pipelining: true
+
 odoo_install_type: standard     # standard, buildout
 odoo_version: 8.0
 odoo_service: odoo
@@ -33,13 +35,14 @@ odoo_reportlab_font_url: http://www.reportlab.com/ftp/pfbfer.zip
 # Tasks related to PostgreSQL
 odoo_postgresql_set_user: True
 odoo_postgresql_user_role_attr: CREATEDB,NOSUPERUSER
-odoo_postgresql_active_unaccent: True
+odoo_postgresql_extensions:
+    - unaccent
 
 # Standard installation/configuration options (odoo_install_type == 'standard')
 odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
 odoo_force_config: True
 odoo_config_addons_path:
-    - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
+    - "/home/{{ odoo_user }}/odoo/server/{{ (odoo_version | int) < 9 and 'openerp' or 'odoo' }}/addons"
     - "/home/{{ odoo_user }}/odoo/server/addons"
 odoo_config_admin_passwd: admin
 odoo_config_auto_reload: False
@@ -51,6 +54,7 @@ odoo_config_db_maxconn: 64
 odoo_config_db_name: False
 odoo_config_db_passwd: False
 odoo_config_db_port: False
+odoo_config_db_sslmode: prefer          # >= 11.0
 odoo_config_db_template: template1
 odoo_config_db_user: "{{ odoo_user }}"
 odoo_config_dbfilter: '.*'
@@ -59,6 +63,9 @@ odoo_config_pidfile: None
 odoo_config_proxy_mode: False
 odoo_config_email_from: False
 odoo_config_geoip_database: /usr/share/GeoIP/GeoLiteCity.dat
+odoo_config_http_enable: True           # >= 11.0
+odoo_config_http_interface: ''          # >= 11.0
+odoo_config_http_port: 8069             # >= 11.0
 odoo_config_limit_memory_hard: 805306368
 odoo_config_limit_memory_soft: 671088640
 odoo_config_limit_time_cpu: 60
@@ -87,20 +94,22 @@ odoo_config_translate_modules: "['all']"
 odoo_config_unaccent: False
 odoo_config_without_demo: False
 odoo_config_workers: 0
-odoo_config_xmlrpc: True
-odoo_config_xmlrpc_interface: ''
-odoo_config_xmlrpc_port: 8069
-odoo_config_xmlrpcs: True
-odoo_config_xmlrpcs_interface: ''
-odoo_config_xmlrpcs_port: 8071
+odoo_config_xmlrpc: True                # <= 10.0
+odoo_config_xmlrpc_interface: ''        # <= 10.0
+odoo_config_xmlrpc_port: 8069           # <= 10.0
+odoo_config_xmlrpcs: True               # <= 8.0
+odoo_config_xmlrpcs_interface: ''       # <= 8.0
+odoo_config_xmlrpcs_port: 8071          # <= 8.0
 # Custom configuration options
 odoo_config_custom: {}
     #your_option1: value1
     #your_option2: value2
 
 # Buildout installation options (odoo_install_type == 'buildout')
+odoo_buildout_version: 2.9.5
 odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
 odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
+odoo_buildout_bootstrap_cmd: "{{ odoo_buildout_venv_path }}/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }} --buildout-version {{ odoo_buildout_version }}"
 odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"
 odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
 odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"

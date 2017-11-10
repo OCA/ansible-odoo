@@ -18,9 +18,11 @@
       when: odoo_config_db_passwd is defined and odoo_config_db_passwd
             and odoo_postgresql_set_user
 
-    - name: PostgreSQL - Activate the 'unaccent' extension on databases
-      postgresql_ext: name=unaccent db=template1
-      when: odoo_postgresql_active_unaccent
+    - name: PostgreSQL - Activate some extensions on the 'template1' database
+      postgresql_ext:
+        name: "{{ item }}"
+        db: template1
+      with_items: "{{ odoo_postgresql_extensions }}"
 
   delegate_to: "{{ odoo_postgresql_delegate_to }}"
   remote_user: "{{ odoo_postgresql_remote_user }}"
