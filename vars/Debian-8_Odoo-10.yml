@@ -52,6 +52,29 @@ odoo_npm_packages:
     - name: phantomjs-prebuilt
       version: 2.1.15
 
+odoo_pip_dependencies:
+    - pip==9.0.1
+    - wrapt
+    - odoo-autodiscover==2.0.0
+    - setuptools-odoo==2.0.2.post1
+
+odoo_pip_build_dependencies:
+    - python-virtualenv
+    - build-essential
+    - python-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - libpq-dev
+    - libldap2-dev
+    - libsasl2-dev
+    - libopenjp2-7-dev
+    - libjpeg62-turbo-dev
+    - libtiff5-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
+    - libssl-dev
+
 odoo_buildout_build_dependencies:
     - python-virtualenv
     - build-essential

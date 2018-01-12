@@ -1,0 +1,1 @@
+https://github.com/odoo/odoo/archive/9.0.tar.gz#egg=odoo

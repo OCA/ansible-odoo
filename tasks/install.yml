@@ -49,7 +49,7 @@
         update={{ project_path.stat.exists == False and 'yes'
                   or (odoo_repo_update and 'yes' or 'no') }}
         depth={{ odoo_repo_depth }}
-  when: odoo_repo_type == 'git' and odoo_repo_url
+  when: odoo_install_type != 'pip' and odoo_repo_type == 'git' and odoo_repo_url
   notify: Restart Odoo
   tags:
     - odoo_project
@@ -65,6 +65,12 @@
   when: odoo_install_type == 'buildout'
   tags:
     - odoo_install_type_buildout
+
+- name: Pip installation
+  import_tasks: install_pip.yml
+  when: odoo_install_type == 'pip'
+  tags:
+    - odoo_install_type_pip
 
 - name: Install NPM packages
   import_tasks: install_npm.yml

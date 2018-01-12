@@ -1,0 +1,13 @@
+---
+
+- hosts: localhost
+  become: yes
+  roles:
+    - ansible-odoo
+  vars:
+    odoo_install_type: pip
+    odoo_service: odoo-pip
+    odoo_init_env:
+        CHANGED_TEST: 1
+  environment:
+    LC_ALL: en_US.UTF-8
