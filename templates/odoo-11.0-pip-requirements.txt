@@ -1,0 +1,2 @@
+https://github.com/odoo/odoo/archive/11.0.tar.gz#egg=odoo
+-e git+https://github.com/OCA/server-ux.git@11.0#egg=odoo11_addon_date_range&subdirectory=setup/date_range

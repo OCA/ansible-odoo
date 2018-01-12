@@ -1,12 +1,17 @@
 # Odoo [![Build Status](https://travis-ci.org/osiell/ansible-odoo.png)](https://travis-ci.org/osiell/ansible-odoo)
 
-Ansible role to install Odoo from a Git or Mercurial repository,
+Ansible role to install Odoo from a Git or Mercurial repository, or from pip,
 and configure it.
 
-This role supports two types of installation:
+This role supports three types of installation:
 
 * **standard**: install the Odoo dependencies from APT repositories and the
 Odoo project from a Git/Hg repository. Odoo is configured with Ansible options
+(`odoo_config_*` ones).
+
+* **pip**: install the Odoo dependencies from APT repositories and the
+Odoo project and modules from a pip requirements.txt file. Odoo is configured
+with  Ansible options
 (`odoo_config_*` ones).
 
 * **buildout**: build the Odoo project from a Git/Hg repository containing a
@@ -100,6 +105,28 @@ Here we set some options required by the ``connector`` framework:
       odoo_config_server_wide_modules: web,web_kanban,connector
       odoo_config_workers: 8
 ```
+
+### odoo_install_type: pip
+
+Pip installation (assuming that PostgreSQL is installed and running on
+the same host). We need to ensure that the environment variable LC_ALL is used
+if Odoo version 11 is to be used:
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  become: yes
+  roles:
+    - role: odoo
+      odoo_install_type: pip
+      odoo_version: 11.0
+      odoo_pip_requirements_url: https://raw.githubusercontent.com/OCA/sample-oca-pip-requirements/11.0/requirements.txt
+      odoo_config_admin_passwd: SuPerPassWorD
+  environment:
+    LC_ALL: en_US.UTF-8
+
+```
+
 
 ### odoo_install_type: buildout
 

@@ -1,0 +1,48 @@
+---
+
+- name: Generate sample requirements.txt file
+  template: src=odoo-{{ odoo_version }}-pip-requirements.txt dest="/home/{{ odoo_user }}/requirements.txt"
+        owner={{ odoo_user }} group={{ odoo_user }} mode=0600
+
+- name: Install build dependencies
+  apt:  pkg={{ item }}
+        state=installed
+        update_cache={{ odoo_apt_update_cache }}
+        cache_valid_time={{ odoo_apt_cache_valid_time }}
+  with_items: "{{ odoo_pip_build_dependencies }}"
+
+- name: Prepare the Python virtual environment
+  become: yes
+  become_user: "{{ odoo_user }}"
+  shell: "{{ odoo_pip_venv_cmd }}"
+  args:
+    creates: "{{ odoo_pip_venv_path }}"
+
+- name: Download the pip requirements file
+  get_url: url="{{ odoo_pip_requirements_url }}"
+           force=yes
+           dest="/home/{{ odoo_user }}/requirements.txt"
+
+- name: Install Odoo dependencies (PyPi)
+  pip:
+    name: "{{ item }}"
+    virtualenv: "{{ odoo_pip_venv_path }}"
+  with_items: "{{ odoo_pip_dependencies }}"
+
+- name: Install Odoo from pip external requirements file
+  pip:
+    requirements: /home/{{ odoo_user }}/requirements.txt
+    extra_args: --upgrade
+    virtualenv: "{{ odoo_pip_venv_path }}"
+
+
+- import_tasks: config.yml
+  tags:
+    - odoo_config
+
+- name: Generate Odoo init script
+  template: src=odoo-pip.init dest=/etc/init.d/{{ odoo_service }}
+        owner=root group=root mode=0755
+        force={{ odoo_force_config and 'yes' or 'no' }}
+        backup=yes
+  notify: Restart Odoo
