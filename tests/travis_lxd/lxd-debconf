@@ -1,0 +1,22 @@
+lxd	lxd/bridge-ipv4-address	string	10.224.136.1
+lxd	lxd/bridge-ipv4-dhcp-leases	string	252
+lxd	lxd/use-existing-bridge	boolean	false
+lxd	lxd/bridge-ipv6-netmask	string	
+lxd	lxd/bridge-ipv6	boolean	false
+lxd	lxd/setup-bridge	boolean	true
+lxd	lxd/bridge-ipv4-netmask	string	24
+lxd	lxd/bridge-ipv4	boolean	true
+lxd	lxd/bridge-ipv6-address	string	
+lxd	lxd/update-profile	boolean	true
+lxd	lxd/bridge-name	string	lxdbr0
+lxd	lxd/bridge-empty-error	note	
+# lxcbr0 is being replaced by lxdbr0
+lxd	lxd/bridge-upgrade-warning	note	
+lxd	lxd/bridge-ipv6-nat	boolean	false
+lxd	lxd/bridge-random-warning	note	
+lxd	lxd/bridge-domain	string	lxd
+lxd	lxd/bridge-dnsmasq	string	
+lxd	lxd/bridge-http-proxy	boolean	false
+lxd	lxd/bridge-ipv4-nat	boolean	true
+lxd	lxd/bridge-ipv4-dhcp-last	string	10.224.136.254
+lxd	lxd/bridge-ipv4-dhcp-first	string	10.224.136.2

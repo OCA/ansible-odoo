@@ -1,13 +1,13 @@
 #!/bin/bash
 # This script fix the Debian Jessie container by replacing systemd by SysV
 #
-CT_DIR="/var/lib/lxd/storage-pools/default/containers/$1"
+CT_DIR="/var/lib/lxd/containers/$1"
 ROOTFS="$CT_DIR/rootfs"
 UID_GID=$(ls -n $CT_DIR | grep rootfs | cut -d ' ' -f "3-4")
 CT_UID=$(echo $UID_GID | cut -d ' ' -f1)
 CT_GID=$(echo $UID_GID | cut -d ' ' -f2)
 CT_UID_GID="$CT_UID:$CT_GID"
-BRIDGE_IP=$(lxc network show testbr0 | grep ipv4.address | cut -d' ' -f4 | cut -d'/' -f1)
+BRIDGE_IP=$(/sbin/ifconfig lxdbr0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')
 # Configure the network of the container
 echo -e "nameserver $BRIDGE_IP\nsearch lxd" > $ROOTFS/etc/resolv.conf
 cat $ROOTFS/etc/resolv.conf

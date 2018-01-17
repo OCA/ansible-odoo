@@ -1,10 +1,9 @@
 #!/bin/bash
+HERE=$(dirname $(readlink -m $0))
 # Install and configure LXD on Travis-CI
-add-apt-repository -y ppa:ubuntu-lxc/lxd-stable;
+debconf-set-selections $HERE/lxd-debconf
+echo 'deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse' > /etc/apt/sources.list.d/backports.list
 apt-get -qq update;
-apt-get -y install lxd;
+apt-get -y install -t trusty-backports ca-certificates lxd;
 lxd init --auto
 usermod -a -G lxd travis
-lxc network create testbr0
-lxc network attach-profile testbr0 default eth0
-lxc network show testbr0
