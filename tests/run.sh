@@ -37,5 +37,5 @@ grep -q 'changed=2.*failed=0' $output_log \
 
 echo "== CHECK THE SERVICE STATUS =="
 sudo -E service odoo-$ODOO_INSTALL_TYPE status || exit 1
-sleep 3 && wget http://localhost:8069  | exit 1
-sudo -E service odoo-$ODOO_INSTALL_TYPE stop  || exit 1
+sleep 3 && if ! wget http://localhost:8069; then tail -n 100 /var/log/odoo/*.log && exit 1; fi
+sudo -E service odoo-$ODOO_INSTALL_TYPE stop || exit 1

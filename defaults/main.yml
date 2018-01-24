@@ -1,7 +1,7 @@
 ansible_ssh_pipelining: true
 
 odoo_install_type: standard     # standard, buildout
-odoo_version: 8.0
+odoo_version: 11.0
 odoo_service: odoo
 odoo_user: odoo
 odoo_user_passwd: odoo
@@ -108,7 +108,7 @@ odoo_config_custom: {}
 # Pip installation options (odoo_install_type == 'pip')
 odoo_pip_venv_path: "{{ odoo_workdir }}/sandbox"
 odoo_pip_requirements_url: "file:///home/{{ odoo_user }}/requirements.txt"
-odoo_pip_odoo_bin_path: "{{ odoo_workdir }}/sandbox/src/odoo/odoo-bin"
+odoo_pip_odoo_bin_path: "{{ odoo_workdir }}/sandbox/bin/odoo"
 
 # Buildout installation options (odoo_install_type == 'buildout')
 odoo_buildout_version: 2.9.5
