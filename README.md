@@ -9,9 +9,8 @@ This role supports three types of installation:
 Odoo project from a Git/Hg repository. Odoo is configured with Ansible options
 (`odoo_config_*` ones).
 
-* **pip**: install the Odoo dependencies from APT repositories and the
-Odoo project and modules from a pip requirements.txt file. Odoo is configured
-with  Ansible options
+* **pip**: install Odoo and its dependencies (modules and Python packages)
+from a pip requirements.txt file. Odoo is configured with  Ansible options
 (`odoo_config_*` ones).
 
 * **buildout**: build the Odoo project from a Git/Hg repository containing a
