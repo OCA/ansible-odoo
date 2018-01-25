@@ -18,12 +18,15 @@
   stat: path={{ odoo_wkhtmltox_dest }}
   register: odoo_wkhtmltox_pkg
 
+- fail: msg="All the downloads failed"
+  when: not odoo_wkhtmltox_pkg.stat.exists
+
 - name: Install wkhtmltox dependencies
   apt:  pkg={{ item }}
   with_items: "{{ odoo_wkhtmltox_depends }}"
-  when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists
+  when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False
 
 - name: Install wkhtmltox
   apt:  deb="/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb"
         force=yes
-  when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists
+  when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False
