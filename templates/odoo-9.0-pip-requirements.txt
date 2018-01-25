@@ -1,1 +1,1 @@
-https://github.com/odoo/odoo/archive/9.0.tar.gz#egg=odoo
+https://nightly.odoo.com/9.0/nightly/src/odoo_9.0.latest.zip
