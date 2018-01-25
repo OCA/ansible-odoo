@@ -29,7 +29,6 @@ odoo_debian_packages:
     - python-pychart
     - python-pydot
     - python-pyparsing
-    - python-pypdf2
     - python-reportlab
     - python-requests
     - python-six
@@ -41,6 +40,10 @@ odoo_debian_packages:
     - python-xlsxwriter
     - python-xlwt
     - python-yaml
+
+odoo_pypi_packages:
+    - psycogreen
+    - pyPdf==1.13
 
 odoo_nodejs_apt_package: "nodejs=6.*"
 odoo_nodejs_apt_repo: "node_6.x"
