@@ -86,6 +86,8 @@ odoo_buildout_build_dependencies:
     - liblcms2-dev
     - libwebp-dev
 
+odoo_wkhtmltox_version: 0.12.1.2
+
 odoo_wkhtmltox_depends:
     - fontconfig
     - libfontconfig1

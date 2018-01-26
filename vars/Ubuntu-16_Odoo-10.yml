@@ -105,8 +105,13 @@ odoo_wkhtmltox_depends:
     - libc6
     - libjpeg-turbo8
 
+odoo_wkhtmltox_version: 0.12.1
+
 # Try Trusty's package if Xenial one is not found
 odoo_wkhtmltox_urls:
+    # Debian packages
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-trusty-{{ odoo_debian_arch }}.deb
     - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
+    # generic tar.gz packages
+    - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-generic-{{ odoo_debian_arch }}.tar.xz
