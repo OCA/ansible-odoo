@@ -23,7 +23,17 @@
   with_items: "{{ odoo_wkhtmltox_depends }}"
   when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists
 
-- name: Install wkhtmltox
-  apt:  deb="/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb"
-        force=yes
-  when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists
+- name: Install wkhtmltox (Debian package)
+  apt:
+    deb: "{{ odoo_wkhtmltox_dest }}"
+    force: yes
+  when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists and odoo_wkhtmltox_pkg.stat.mimetype in ['application/x-debian-package', 'application/vnd.debian.binary-package']
+
+- name: Install wkhtmltox (generic package)
+  unarchive:
+    remote_src: yes
+    src: "{{ odoo_wkhtmltox_dest }}"
+    dest: /usr/local
+    extra_opts: "--strip-components=1"
+    creates: /usr/local/bin/wkhtmltopdf
+  when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists and odoo_wkhtmltox_pkg.stat.mimetype == 'application/x-xz'
