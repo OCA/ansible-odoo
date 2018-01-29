@@ -1,0 +1,15 @@
+[Unit]
+Description={{ odoo_service }}
+After=network.target
+
+[Service]
+Type=simple
+User={{ odoo_user }}
+WorkingDirectory={{ odoo_workdir }}
+ExecStart={{ odoo_buildout_odoo_bin_path }}
+{% for name, value in odoo_init_env.iteritems() %}
+Environment={{ name }}={{ value }}
+{% endfor %}
+
+[Install]
+WantedBy=multi-user.target
