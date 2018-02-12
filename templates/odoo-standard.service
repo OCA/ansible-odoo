@@ -7,9 +7,9 @@ Type=simple
 User={{ odoo_user }}
 WorkingDirectory={{ odoo_workdir }}
 {% if odoo_version | version_compare('10.0', '>=') %}
-ExecStart={{ odoo_rootdir }}/odoo-bin --logfile {{ odoo_logdir }}/{{ odoo_service }}.log
+ExecStart={{ odoo_rootdir }}/odoo-bin --logfile {{ odoo_logdir }}/{{ odoo_service }}.log --config {{ odoo_config_file }}
 {% else %}
-ExecStart={{ odoo_rootdir }}/odoo.py --logfile {{ odoo_logdir }}/{{ odoo_service }}.log
+ExecStart={{ odoo_rootdir }}/odoo.py --logfile {{ odoo_logdir }}/{{ odoo_service}}.log --config {{ odoo_config_file }}
 {% endif %}
 {% for name, value in odoo_init_env.iteritems() %}
 Environment={{ name }}={{ value }}

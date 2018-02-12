@@ -20,6 +20,7 @@ VIRTUALENV={{ odoo_pip_venv_path }}
 DAEMON={{ odoo_pip_odoo_bin_path }}
 NAME={{ odoo_service }}
 DESC={{ odoo_service }}
+CONFIG={{ odoo_config_file }}
 LOGFILE={{ odoo_logdir }}/{{ odoo_service }}.log
 PIDFILE=/var/run/${NAME}.pid
 USER={{ odoo_user }}
@@ -40,7 +41,7 @@ function _start() {
     # from the configuration file
     #   Odoo: https://github.com/odoo/odoo/pull/13685
 	#   OCB:  https://github.com/OCA/OCB/pull/553
-    start-stop-daemon --chdir=${WORKDIR} --start --quiet --pidfile $PIDFILE --chuid $USER:$USER --background --make-pidfile --exec $DAEMON -- --logfile $LOGFILE{{ odoo_config_server_wide_modules not in [False, 'None', ''] and ' --load=%s' % odoo_config_server_wide_modules or '' }}
+    start-stop-daemon --chdir=${WORKDIR} --start --quiet --pidfile $PIDFILE --chuid $USER:$USER --background --make-pidfile --exec $DAEMON -- --config $CONFIG --logfile $LOGFILE{{ odoo_config_server_wide_modules not in [False, 'None', ''] and ' --load=%s' % odoo_config_server_wide_modules or '' }}
 }
 
 function _stop() {
