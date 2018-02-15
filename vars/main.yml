@@ -25,7 +25,7 @@ odoo_wkhtmltox_urls:
     # generic tar.gz packages
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-generic-{{ odoo_debian_arch }}.tar.xz
 
-odoo_wkhtmltox_dest: "/root/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}"
+odoo_wkhtmltox_dest: "/opt/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}"
 
 # == NodeJS + npm ==
 odoo_nodejs_apt_package: "nodejs=0.10*"
