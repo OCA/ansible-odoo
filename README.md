@@ -234,3 +234,6 @@ promote its widespread use.
 
 To contribute to this module, please visit https://odoo-community.org.
 
+## Licence
+
+This project is licensed under the terms of the GPLv3 license.
