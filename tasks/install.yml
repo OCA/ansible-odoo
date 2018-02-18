@@ -22,6 +22,10 @@
   tags:
     - odoo_log
 
+- name: Create odoo data dir directory
+  file: path={{ odoo_config_data_dir }} state=directory
+        owner={{ odoo_user }} group={{ odoo_user }} force=yes
+
 - name: Project repository already cloned?
   stat: path={{ odoo_repo_dest }}
   register: project_path
