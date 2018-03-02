@@ -22,10 +22,6 @@
   tags:
     - odoo_log
 
-- name: Create odoo data dir directory
-  file: path={{ odoo_config_data_dir }} state=directory
-        owner={{ odoo_user }} group={{ odoo_user }} force=yes
-
 - name: Project repository already cloned?
   stat: path={{ odoo_repo_dest }}
   register: project_path
@@ -57,6 +53,10 @@
   notify: Restart Odoo
   tags:
     - odoo_project
+
+- name: Create odoo data dir directory
+  file: path={{ odoo_config_data_dir }} state=directory
+        owner={{ odoo_user }} group={{ odoo_user }} force=yes
 
 - name: Standard installation
   import_tasks: install_standard.yml
