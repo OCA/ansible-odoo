@@ -57,6 +57,10 @@
 - name: Create odoo data dir directory
   file: path={{ odoo_config_data_dir }} state=directory
         owner={{ odoo_user }} group={{ odoo_user }} force=yes
+  when: odoo_install_type != 'buildout'
+  tags:
+    - odoo_install_type_pip
+    - odoo_install_type_standard
 
 - name: Standard installation
   import_tasks: install_standard.yml
