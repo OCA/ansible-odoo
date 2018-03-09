@@ -17,7 +17,9 @@
             force=yes
             backup=yes
       when: ansible_service_mgr == 'systemd'
-      notify: Restart Odoo
+      notify:
+      - Reload Systemd
+      - Restart Odoo
   when: odoo_install_type == 'standard'
 
 - block:
@@ -37,7 +39,9 @@
             force=yes
             backup=yes
       when: ansible_service_mgr == 'systemd'
-      notify: Restart Odoo
+      notify:
+      - Reload Systemd
+      - Restart Odoo
   when: odoo_install_type == 'buildout'
 
 - block:
@@ -57,7 +61,9 @@
             force=yes
             backup=yes
       when: ansible_service_mgr == 'systemd'
-      notify: Restart Odoo
+      notify:
+      - Reload Systemd
+      - Restart Odoo
   when: odoo_install_type == 'pip'
 
 - name: Enable Odoo service
