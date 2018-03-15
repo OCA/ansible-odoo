@@ -11,6 +11,7 @@ odoo_init_env: {}
     #VAR1: value1
     #VAR2: value2
 odoo_logdir: "/var/log/{{ odoo_user }}"
+odoo_logfile: "{{ ansible_service_mgr != 'systemd' and ('/'.join([odoo_logdir, odoo_service]) + '.log') or ''}}"
 odoo_workdir: "/home/{{ odoo_user }}/odoo"
 odoo_rootdir: "{{ odoo_install_type == 'buildout' and '/home/'+odoo_user+'/odoo/parts/odoo' or '/home/'+odoo_user+'/odoo/server' }}"
 
