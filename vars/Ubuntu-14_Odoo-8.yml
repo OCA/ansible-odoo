@@ -38,7 +38,7 @@ odoo_debian_packages:
     - python-gevent
 
 odoo_pip_dependencies:
-    - pip==9.0.1
+    - pip>=9.0.1
     - wrapt
     - odoo-autodiscover==2.0.0
     - setuptools-odoo==2.0.2.post1
