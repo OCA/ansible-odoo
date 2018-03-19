@@ -6,7 +6,8 @@ After=network.target
 Type=simple
 User={{ odoo_user }}
 WorkingDirectory={{ odoo_workdir }}
-ExecStart={{ odoo_pip_odoo_bin_path }} --logfile {{ odoo_logdir }}/{{ odoo_service}}.log --config {{ odoo_config_file }}
+ExecStart={{ odoo_pip_odoo_bin_path }}{{ odoo_logfile and ' --logfile %s' % odoo_logfile }} --config {{ odoo_config_file }}
+KillMode=mixed
 {% for name, value in odoo_init_env.iteritems() %}
 Environment={{ name }}={{ value }}
 {% endfor %}
