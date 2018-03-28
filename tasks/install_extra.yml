@@ -1,9 +1,0 @@
----
-
-- name: Set SSH public keys for the Odoo user
-  authorized_key: user={{ odoo_user }}
-                  key="{{ lookup('file', item) }}"
-  with_fileglob:
-    - "{{ odoo_user_sshkeys }}"
-  tags:
-    - odoo_ssh
