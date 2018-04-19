@@ -4,7 +4,9 @@ odoo_install_type: standard     # standard, buildout
 odoo_version: 11.0
 odoo_service: odoo
 odoo_user: odoo
-odoo_user_passwd: odoo
+odoo_user_passwd: "*"   # http://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+odoo_user_update_password: always
+odoo_user_shell: /bin/bash
 odoo_user_system: False
 odoo_init: True
 odoo_init_env: {}
