@@ -50,6 +50,7 @@ odoo_npm_packages:
 odoo_pip_dependencies:
     - pip>=9.0.1
     - wrapt
+    - setuptools>=38.2.3
     - odoo-autodiscover==2.0.0
     - setuptools-odoo==2.0.2.post1
 

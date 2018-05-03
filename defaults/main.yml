@@ -4,7 +4,9 @@ odoo_install_type: standard     # standard, buildout
 odoo_version: 11.0
 odoo_service: odoo
 odoo_user: odoo
-odoo_user_passwd: odoo
+odoo_user_passwd: "*"   # http://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+odoo_user_update_password: always
+odoo_user_shell: /bin/bash
 odoo_user_system: False
 odoo_init: True
 odoo_init_env: {}
@@ -109,7 +111,7 @@ odoo_pip_requirements_url: "file:///home/{{ odoo_user }}/requirements.txt"
 odoo_pip_odoo_bin_path: "{{ odoo_pip_venv_path }}/bin/{{ (odoo_version | int) < 10 and 'odoo.py' or 'odoo' }}"
 
 # Buildout installation options (odoo_install_type == 'buildout')
-odoo_buildout_version: 2.9.5
+odoo_buildout_version: 2.10.0
 odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
 odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
 odoo_buildout_bootstrap_cmd: "{{ odoo_buildout_venv_path }}/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }} --buildout-version {{ odoo_buildout_version }}"

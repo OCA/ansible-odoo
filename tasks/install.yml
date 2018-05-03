@@ -10,9 +10,12 @@
     - odoo_required_tools
 
 - name: Add Odoo system user
-  user: name={{ odoo_user }} shell=/bin/bash
-        password={{ odoo_user_passwd }} update_password=on_create
-        system={{ odoo_user_system }}
+  user:
+    name: "{{ odoo_user }}"
+    shell: "{{ odoo_user_shell }}"
+    password: "{{ odoo_user_passwd }}"
+    update_password: "{{ odoo_user_update_password }}"
+    system: "{{ odoo_user_system }}"
   tags:
     - odoo_user
 
