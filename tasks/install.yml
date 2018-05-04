@@ -19,6 +19,11 @@
   tags:
     - odoo_user
 
+- name: Configure SSH for the Odoo user
+  import_tasks: install_ssh.yml
+  tags:
+    - odoo_install_ssh
+
 - name: Create log directory
   file: path={{ odoo_logdir }} state=directory
         owner={{ odoo_user }} group={{ odoo_user }} force=no
@@ -89,8 +94,3 @@
   tags:
     - odoo
     - odoo_packages
-
-- import_tasks: install_extra.yml
-  when: odoo_user_sshkeys is defined and odoo_user_sshkeys
-  tags:
-    - odoo_install_extra

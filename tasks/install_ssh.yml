@@ -1,0 +1,54 @@
+---
+
+- block:
+
+    - name: SSH - Install private and public keys for the Odoo user
+      copy:
+        src: "{{ item.value }}"
+        dest: "{{ odoo_user_ssh_dir }}/id_rsa{{ '.pub' if item.key == 'pub' else '' }}"
+        mode: "{{ '0600' if item.key == 'priv' else '0644' }}"
+      with_dict: "{{ odoo_user_ssh_key }}"
+
+    - name: SSH - Remove private and public keys if none is defined
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_list:
+          - "{{ odoo_user_ssh_dir }}/id_rsa"
+          - "{{ odoo_user_ssh_dir }}/id_rsa.pub"
+      when: not odoo_user_ssh_key
+
+    - name: SSH - Make sure the SSH directory exists
+      file:
+        path: "{{ odoo_user_ssh_dir }}"
+        state: directory
+        mode: 0700
+      changed_when: no
+
+    - name: SSH - Make sure the known_hosts file exists
+      file:
+        path: "{{ odoo_user_ssh_known_hosts_file }}"
+        state: touch
+      changed_when: no
+
+    - name: SSH - Check host name availability in the known hosts file
+      shell: "ssh-keygen -f {{ odoo_user_ssh_known_hosts_file }} -F {{ item }}"
+      with_items: "{{ odoo_user_ssh_known_hosts }}"
+      register: odoo_user_ssh_known_host_results
+      ignore_errors: yes
+      changed_when: no
+
+    - name: SSH - Scan hosts public keys
+      shell: "{{ odoo_ssh_keyscan_cmd}} {{ item.item }} >> {{ odoo_user_ssh_known_hosts_file }}"
+      when: item.stdout == ""
+      with_items: "{{ odoo_user_ssh_known_host_results.results }}"
+
+    - name: Set SSH public keys for the Odoo user
+      authorized_key:
+        user: "{{ odoo_user }}"
+        key: "{{ lookup('file', item) }}"
+      with_fileglob:
+        - "{{ odoo_user_sshkeys }}"
+
+  become: yes
+  become_user: "{{ odoo_user }}"

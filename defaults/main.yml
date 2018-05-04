@@ -121,5 +121,22 @@ odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
 odoo_buildout_extra_dependencies: []    # Extra Debian packages required
                                         # to run your Buildout recipe
 
-# Extra options
-odoo_user_sshkeys: ""       # ../../path/to/public_keys/*
+# SSH configuration options
+odoo_user_ssh_dir: "/home/{{ odoo_user }}/.ssh"
+odoo_user_ssh_key: {}
+    # This option set only a pair of private key (/!\ without password /!\)
+    # and public key saved as 'id_rsa{.pub}' (default path) allowing version
+    # control like Git to clone repositories without configuring the ssh-agent.
+    # Example:
+    # odoo_user_ssh_key:
+    #   priv: "path/to/private_key"
+    #   pub:  "path/to/public_key.pub"
+odoo_user_ssh_known_hosts_file: "{{ odoo_user_ssh_dir }}/known_hosts"
+odoo_user_ssh_known_hosts: []
+    # This option add hosts fingerprint to the 'known_hosts' file. Example:
+    # odoo_user_ssh_known_hosts:
+    #   - bitbucket.org
+    #
+# FIXME: 'odoo_user_sshkeys' option (and the underlying task) needs refactoring
+# to handle the state of SSH public keys (present/absent).
+odoo_user_sshkeys: ""       # ./path/to/public_keys/*

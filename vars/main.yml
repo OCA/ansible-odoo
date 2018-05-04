@@ -37,3 +37,6 @@ odoo_nodejs_apt_repositories:
 odoo_nodejs_apt_keys:
     - url: http://deb.nodesource.com/gpgkey/nodesource.gpg.key
       state: present
+
+# SSH
+odoo_ssh_keyscan_cmd: "ssh-keyscan -H -T 10"
