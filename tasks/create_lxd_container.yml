@@ -1,0 +1,64 @@
+---
+
+- name: Create a started container
+  lxd_container:
+   name: "{{ lxd_container_name }}"
+   state: started
+   source:
+     type: image
+     mode: pull
+     server: https://images.linuxcontainers.org
+     protocol: lxd
+     alias: ubuntu/xenial/amd64
+   profiles: ["default"]
+   wait_for_ipv4_addresses: true
+   timeout: 600
+
+- name: Add new continer name in hosts file
+  become_user: "{{ host_user }}"
+  lineinfile:
+    dest: hosts
+    line: "{{ lxd_container_name }} ansible_connection=lxd"
+
+- name: Refresh hosts
+  meta: refresh_inventory
+
+- name: check python is installed in container
+  delegate_to: "{{ lxd_container_name }}"
+  connection: lxd
+  raw: dpkg -s python
+  register: python_install_check
+  failed_when: python_install_check.rc not in [0, 1]
+  changed_when: false
+
+- name: install python in container
+  delegate_to: "{{ lxd_container_name }}"
+  raw: apt-get install -y python
+  when: python_install_check.rc == 1
+
+- name: Make "{{ odoo_user }}" home folder
+  delegate_to: "{{ lxd_container_name }}"
+  file:
+    path: /home/{{ odoo_user }}
+    state: directory
+    mode: 0777
+    owner: ubuntu
+    group: ubuntu
+  when: odoo_user != 'ubuntu' and sunflower_repo == True
+
+- name: Make ssh folder
+  delegate_to: "{{ lxd_container_name }}"
+  file:
+    path: /home/{{ odoo_user }}/.ssh
+    state: directory
+    mode: 0700
+    owner: ubuntu
+    group: ubuntu
+  when: sunflower_repo == True
+
+- name: Copy id_rsa key
+  become_user: "{{ host_user }}"
+  become: yes
+  shell: |
+    lxc file push /home/{{ host_user }}/.ssh/id_rsa {{lxd_container_name}}/home/{{ odoo_user }}/.ssh/
+  when: sunflower_repo == True

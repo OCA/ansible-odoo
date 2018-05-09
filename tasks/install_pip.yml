@@ -6,10 +6,17 @@
 
 - name: Install build dependencies
   apt:  pkg={{ item }}
-        state=installed
+        state=present
         update_cache={{ odoo_apt_update_cache }}
         cache_valid_time={{ odoo_apt_cache_valid_time }}
   with_items: "{{ odoo_pip_build_dependencies }}"
+
+- name: Install vertual enviroment
+  apt:  pkg=python-virtualenv
+        state=installed
+        update_cache={{ odoo_apt_update_cache }}
+        cache_valid_time={{ odoo_apt_cache_valid_time }}
+  when: env_type
 
 - name: Prepare the Python virtual environment
   become: yes
@@ -17,6 +24,7 @@
   shell: "{{ odoo_pip_venv_cmd }}"
   args:
     creates: "{{ odoo_pip_venv_path }}"
+  when: env_type
 
 - name: Download the pip requirements file
   become: yes

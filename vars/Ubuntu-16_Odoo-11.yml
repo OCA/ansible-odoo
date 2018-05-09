@@ -78,9 +78,10 @@ odoo_pip_build_dependencies:
     - liblcms2-dev
     - libwebp-dev
     - libssl-dev
+    - libffi-dev
+    - node-less
 
 odoo_buildout_build_dependencies:
-    - virtualenv
     - build-essential
     - python3-dev
     - libxml2-dev

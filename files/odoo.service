@@ -1,0 +1,10 @@
+[Unit]
+Description=Odoo
+After=postgresql.service
+[Service]
+Type=simple
+User=ubuntu
+ExecStart=/home/ubuntu/odoobuildout/bin/start_odoo
+
+[Install]
+WantedBy=default.target

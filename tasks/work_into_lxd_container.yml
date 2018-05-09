@@ -1,0 +1,54 @@
+---
+
+- name: config LXD container
+  import_tasks: config_lxd_container.yml
+  tags:
+    - lxd_container
+    - lxd
+  when: lxd_type == True and lxd_step == True and lxd_container_name != "localhost"
+
+- name: Create and config LXD postgresql database
+  import_tasks: lxd_postgresql.yml
+  when: postgresql_step
+
+- name: Set variables depending on the platform and the version of Odoo
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}_Odoo-{{ odoo_version | int }}.yml"
+  tags:
+    - always
+  when: buildout_step
+
+- name: Set variables to work without virtual environment
+  set_fact: odoo_buildout_venv_path="/usr" odoo_pip_venv_path="/usr" 
+  when: env_type == False and buildout_step == True
+
+- name: Set variables to config buildout from  local.cfg
+  set_fact: odoo_buildout_config_path="{{ odoo_workdir }}/local.cfg"
+  when: sunflower_repo == True and buildout_step == True
+
+- import_tasks: install.yml
+  tags:
+    - odoo
+    - odoo_install
+  when: buildout_step
+
+- import_tasks: wkhtmltox.yml
+  tags:
+    - odoo
+    - odoo_wkhtmltox
+  when: buildout_step == True and app_after_buildout == True
+
+- import_tasks: reportlab.yml
+  tags:
+    - odoo
+    - odoo_reportlab
+  when: buildout_step == True and app_after_buildout == True
+
+- import_tasks: service.yml
+  tags:
+    - odoo
+    - odoo_service
+  when: buildout_step
+
+

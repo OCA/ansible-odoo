@@ -1,0 +1,91 @@
+---
+
+- name: Check {{ nginx_subdomain }}.{{ nginx_domain }} file if exists
+  become_user: root
+  stat:
+    path: /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+  register: stat_result
+
+- name: Generate random string
+  become_user: root
+  shell: head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''
+  register: random_string
+  when: stat_result.stat.exists == True
+
+- name: rename {{ nginx_subdomain }}.{{ nginx_domain }} to {{ nginx_subdomain }}.{{ random_string.stdout }}
+  become_user: root
+  shell: mv /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }} /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ random_string.stdout }}
+  when: stat_result.stat.exists == True
+
+- name: Touch {{ nginx_subdomain }}.{{ nginx_domain }}
+  become_user: root
+  file:
+    path: /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+    state: touch
+
+- name: Set odoo ip
+  set_fact: odoo_ip="{{ container_ip.stdout }}"
+  when: lxd_type == True and lxd_step == True
+
+- name: Git container ip
+  delegate_to: "{{ lxd_container_name }}"
+  become: yes
+  become_user: root
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}'"
+  register: ip_contents
+  when: lxd_type == True and lxd_step == False
+
+- name: Set odoo ip
+  set_fact: odoo_ip="{{ ip_contents.stdout }}"
+  when: lxd_type == True and lxd_step == False
+
+- name: Config sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+  become_user: root
+  lineinfile:
+    dest: /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+    line: "{{ item }}"
+  with_items:
+    - "server {"
+    - "  listen 80;"
+    - "  server_name {{ nginx_subdomain }}.{{ nginx_domain }};"
+    - "\n"
+    - "  client_max_body_size 200M;"
+    - "\n"
+    - "  proxy_connect_timeout       6000s;"
+    - "  proxy_send_timeout          6000s;"
+    - "  proxy_read_timeout          6000s;"
+    - "  send_timeout                6000s;"
+    - "\n"
+    - "  proxy_set_header   Host      $http_host;"
+    - "  proxy_set_header   X-Real-IP $remote_addr;"
+    - "  proxy_set_header   X-Forward-For $proxy_add_x_forwarded_for;"
+    - "\n"
+    - "  location / { "
+    - "    proxy_pass http://{{ odoo_ip }}:{{ odoo_config_xmlrpc_port }};"
+    - "    proxy_set_header Host $host;"
+    - "    proxy_set_header X-Real-IP $remote_addr;"
+    - "    proxy_set_header X-Scheme $scheme;"
+    - "    proxy_connect_timeout 600;"
+    - "    proxy_send_timeout 600;"
+    - "    proxy_read_timeout 600;"
+    - "\n"
+    - "  }"
+    - "\n"
+    - "  location /lonngpolling { "
+    - "    proxy_pass http://{{ odoo_ip }}:{{ odoo_config_longpolling_port }};"
+    - "  }  "
+    - "\n"
+    - "} "
+
+
+- name: Make link to sites-enabled
+  become_user: root
+  file:
+    src: "/etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}"
+    dest: "/etc/nginx/sites-enabled/{{ nginx_subdomain }}.{{ nginx_domain }}"
+    state: link
+
+
+- name: Reload nginx
+  become: yes
+  shell: nginx -t && nginx -s reload

@@ -40,3 +40,8 @@ odoo_nodejs_apt_keys:
 
 # SSH
 odoo_ssh_keyscan_cmd: "ssh-keyscan -H -T 10"
+
+
+
+
+

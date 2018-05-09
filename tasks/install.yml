@@ -2,12 +2,20 @@
 
 - name: Install required tools
   apt:  pkg={{ item }}
-        state=installed
+        state=present
         update_cache={{ odoo_apt_update_cache }}
         cache_valid_time={{ odoo_apt_cache_valid_time }}
   with_items: "{{ odoo_required_tools }}"
   tags:
     - odoo_required_tools
+  when: app_before_buildout
+
+- name: Ensure a locale exists
+  become_user: root
+  locale_gen:
+    name: nl_NL.UTF-8
+    state: present
+  when: app_before_buildout == True and sunflower_repo == True
 
 - name: Add Odoo system user
   user:
@@ -18,37 +26,102 @@
     system: "{{ odoo_user_system }}"
   tags:
     - odoo_user
+  when: not lxd_type
 
-- name: Configure SSH for the Odoo user
-  import_tasks: install_ssh.yml
-  tags:
-    - odoo_install_ssh
+- name: Make ssh folder
+  file:
+    path: /home/{{ odoo_user }}/.ssh
+    state: directory
+    mode: 0700
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+  when: sunflower_repo == True and lxd_type == False
 
-- name: Create log directory
-  file: path={{ odoo_logdir }} state=directory
-        owner={{ odoo_user }} group={{ odoo_user }} force=no
-  tags:
-    - odoo_log
+- name: copy id_rsa file
+  copy:
+    src: id_rsa
+    dest: /home/{{ odoo_user }}/.ssh/
+    force: yes
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+    mode: 0600
+  when: sunflower_repo == True and lxd_type == False
 
-- name: Project repository already cloned?
-  stat: path={{ odoo_repo_dest }}
-  register: project_path
-  tags:
-    - odoo_project
+- name: chmode /home/{{ odoo_user }}
+  file:
+    path: /home/{{ odoo_user }}
+    mode: 0755
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+  when: odoo_user != 'ubuntu' and sunflower_repo == True
 
-- name: Clone project repository (Mercurial)
+- name: chmode /home/{{ odoo_user }}/.ssh
+  file:
+    path: /home/{{ odoo_user }}/.ssh
+    mode: 0700
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+  when: odoo_user != 'ubuntu' and sunflower_repo == True
+
+- name: chmode /home/{{ odoo_user }}/.ssh/id_rsa
+  file:
+    path: /home/{{ odoo_user }}/.ssh/id_rsa
+    mode: 0600
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+  when: sunflower_repo == True
+
+- name: Touch Known_hosts
+  become_user: root
+  file:
+    path: /home/{{ odoo_user }}/.ssh/known_hosts
+    state: touch
+    mode: 0755
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+  when: sunflower_repo
+
+- name: Add github key to known_hosts
+  become_user: "{{ odoo_user }}"
+  shell: |
+    ssh-keygen -F github.com || ssh-keyscan github.com >> /home/{{ odoo_user }}/.ssh/known_hosts
+  when: sunflower_repo
+
+- name: Config git account
   become: yes
   become_user: "{{ odoo_user }}"
-  hg:   repo={{ odoo_repo_url }}
-        dest={{ odoo_repo_dest }}
-        revision={{ odoo_repo_rev | string }}
-  when: odoo_repo_type == 'hg' and odoo_repo_url
-        and (odoo_repo_update or (project_path.stat.exists == False))
+  shell: |
+    git config --global user.email "{{ github_account }}"
+    git config --global user.name  "{{ github_account_name }}"
+  when: sunflower_repo
+
+
+- name: Ensure python-pip is installed
+  apt: pkg=python-pip state=present
+  when: app_before_buildout
+
+- name: install latest pip
+  become_user: root
+  easy_install:
+    name: pip
+    state: present
+  when: app_before_buildout
+
+- name: Clone project from sunflower repository (Git)
+  become: yes
+  become_user: "{{ odoo_user }}"
+  git:
+    clone: yes
+    force: yes
+    repo: "{{ sunflower_repo_url }}"
+    version: "{{ branch }}"
+    dest: "{{ odoo_workdir }}"
+  when: odoo_install_type != 'pip' and odoo_repo_type == 'git' and odoo_repo_url and sunflower_repo == True
   notify: Restart Odoo
   tags:
     - odoo_project
 
-- name: Clone project repository (Git)
+- name: Clone project from OCA repository (Git)
   become: yes
   become_user: "{{ odoo_user }}"
   git:  repo={{ odoo_repo_url }}
@@ -57,7 +130,7 @@
         update={{ project_path.stat.exists == False and 'yes'
                   or (odoo_repo_update and 'yes' or 'no') }}
         depth={{ odoo_repo_depth }}
-  when: odoo_install_type != 'pip' and odoo_repo_type == 'git' and odoo_repo_url
+  when: odoo_install_type != 'pip' and odoo_repo_type == 'git' and odoo_repo_url and sunflower_repo == False
   notify: Restart Odoo
   tags:
     - odoo_project
@@ -90,7 +163,7 @@
 
 - name: Install NPM packages
   import_tasks: install_npm.yml
-  when: (odoo_version | int) >= 9
+  when: (odoo_version | int) >= 9 and app_after_buildout == True
   tags:
     - odoo
     - odoo_packages

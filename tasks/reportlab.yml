@@ -8,7 +8,7 @@
   file: path="/home/{{ odoo_user }}/fonts" state=directory
 
 - name: Install unzip
-  apt: name=unzip state=installed
+  apt: name=unzip state=present
 
 - name: Unzip the ReportLab fonts
   unarchive: src="/opt/pfbfer.zip"

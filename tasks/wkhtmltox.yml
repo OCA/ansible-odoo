@@ -9,6 +9,7 @@
   with_items: "{{ odoo_wkhtmltox_urls }}"
   ignore_errors: True
   when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False
+  failed_when: false
 
 # Use to detect that the package was downloaded.
 # We can not register the result of the previous task to check this as Ansible

@@ -1,33 +1,60 @@
 ---
 
-- name: Set variables depending on the platform and the version of Odoo
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}_Odoo-{{ odoo_version | int }}.yml"
-  tags:
-    - always
+- name: check "{{ lxd_container_name }}" if exist
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+  when: lxd_type == True
 
-- import_tasks: install.yml
-  tags:
-    - odoo
-    - odoo_install
+- debug:
+    msg: The {{ lxd_container_name }} container is exist
+  when: lxd_type == True and lxd_state.stdout == "PERSISTENT"
 
-- import_tasks: wkhtmltox.yml
-  tags:
-    - odoo
-    - odoo_wkhtmltox
+- meta: end_play
+  when: new_lxd_container == True and lxd_type == True and lxd_state.stdout == "PERSISTENT"
 
-- import_tasks: reportlab.yml
-  tags:
-    - odoo
-    - odoo_reportlab
+- name: Be careful
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c then Enter' to containeu.
+      - If you make it by mistake press 'q then Enter' then correct new_lxd_container variable to be 'True' and chose other lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_type == True and lxd_state.stdout == "PERSISTENT"
 
-- import_tasks: postgresql.yml
-  tags:
-    - odoo
-    - odoo_postgresql
+- name: create "{{ lxd_container_name }}"
+  import_tasks: create_lxd_container.yml
+  when: lxd_type == True and lxd_container_name != "localhost" and lxd_step == True
 
-- import_tasks: service.yml
+
+
+- name: Work into LXD container
+  delegate_to: "{{ lxd_container_name }}"
+  import_tasks: work_into_lxd_container.yml
   tags:
-    - odoo
-    - odoo_service
+    - lxd_container
+  when: lxd_type
+
+- name: Create and config LXD postgresql database
+  import_tasks: lxd_postgresql.yml
+  when: lxd_type == False and postgresql_step == True
+
+- name: Direct intallation
+  import_tasks: direct_installation.yml
+  tags:
+    - direct_installation
+  when: lxd_type == False
+
+- name: Config LXD container in nginx
+  import_tasks: config_nginx_proxy.yml
+  tags:
+    - nginx
+    - lxd_container
+    - lxd
+  when: nginx_step
+
+- debug:
+    msg:
+      - For more information please read our toturial
+      - https://github.com/sunflowerit/ansible-odoo

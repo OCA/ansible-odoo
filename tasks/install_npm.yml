@@ -5,20 +5,24 @@
     url: "{{ item.url }}"
     state: "{{ item.state }}"
   with_items: "{{ odoo_nodejs_apt_keys | default([]) }}"
+  when: app_after_buildout
 
 - name: Configure NodeJS APT repository
   apt_repository:
     repo: "{{ item.repo }}"
     state: "{{ item.state }}"
   with_items: "{{ odoo_nodejs_apt_repositories | default([]) }}"
+  when: app_after_buildout
 
 - name: Install NodeJS
   apt:  pkg="{{ odoo_nodejs_apt_package }}"
-        state=installed
+        state=present
         update_cache=yes
+  when: app_after_buildout
 
 - name: Install Odoo dependencies (npm)
   npm:  name={{ item.name }}
         version={{ item.version }}
         global=yes
   with_items: "{{ odoo_npm_packages | default([]) }}"
+  when: app_after_buildout

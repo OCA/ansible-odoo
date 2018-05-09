@@ -71,7 +71,6 @@ odoo_pip_build_dependencies:
     - libssl-dev
 
 odoo_buildout_build_dependencies:
-    - virtualenv
     - build-essential
     - python-dev
     - libxml2-dev
@@ -85,6 +84,7 @@ odoo_buildout_build_dependencies:
     - libfreetype6-dev
     - liblcms2-dev
     - libwebp-dev
+    - libffi-dev
 
 odoo_wkhtmltox_version: 0.12.1
 

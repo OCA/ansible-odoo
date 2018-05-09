@@ -1,0 +1,73 @@
+---
+
+- name: Git container DHCP ip
+  become: yes
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}'"
+  register: container_ip
+  when: lxd_step
+
+- name: Git container DHCP Broadcast
+  become: yes
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f3 | awk '{print $1}'"
+  register: container_broadcast
+  when: lxd_step
+
+- name: Git container DHCP Netmask
+  become: yes
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f4 | awk '{print $1}'"
+  register: container_netmask
+  when: lxd_step
+
+- name: Git container DHCP gateway
+  become: yes
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ip route |grep '^default' | awk '/eth0/' | cut -d' ' -f3"
+  register: container_gateway
+  when: lxd_step
+
+- name: Remove /etc/network/interfaces
+  file:
+    path: /etc/network/interfaces
+    state: absent
+  become_user: root
+
+- name: Touch /etc/network/interfaces
+  become_user: root
+  file:
+    path: /etc/network/interfaces
+    state: touch
+
+- name: Config /etc/network/interfaces
+  become_user: root
+  lineinfile:
+    dest: /etc/network/interfaces
+    line: "{{ item }}"
+  with_items:
+    - auto lo
+    - iface lo inet loopback
+    - " "
+    - auto eth0
+    - iface eth0 inet static
+    - "address {{ container_ip.stdout }}"
+    - "netmask {{ container_netmask.stdout }}"
+    - "broadcast {{ container_broadcast.stdout }}"
+    - "gateway {{ container_gateway.stdout }}"
+    - "dns-nameservers {{ container_gateway.stdout }} {{ container_nameservers }}"
+
+- name: Restart networking service
+  become: yes
+  become_user: root
+  shell: |
+    ifdown eth0
+    ifup eth0
+    service networking restart
+
+
+

@@ -2,17 +2,16 @@
 
 - name: Install build dependencies
   apt:  pkg={{ item }}
-        state=installed
+        state=present
         update_cache={{ odoo_apt_update_cache }}
         cache_valid_time={{ odoo_apt_cache_valid_time }}
   with_items: "{{ odoo_buildout_build_dependencies }}"
+  when: app_before_buildout
 
-- name: Install extra dependencies
-  apt:  pkg={{ item }}
-        state=installed
-        update_cache={{ odoo_apt_update_cache }}
-        cache_valid_time={{ odoo_apt_cache_valid_time }}
-  with_items: "{{ odoo_buildout_extra_dependencies }}"
+- name: Installing virtual enviroment using pip
+  pip:
+     name: virtualenv
+  when: env_type
 
 - name: Prepare the Python virtual environment
   become: yes
@@ -20,10 +19,58 @@
   shell: "{{ odoo_buildout_venv_cmd }}"
   args:
     creates: "{{ odoo_buildout_venv_path }}"
+  when: env_type
 
 - name: Copy the bootstrap.py script
   copy: src=bootstrap.py dest={{ odoo_buildout_bootstrap_path }}
         owner={{ odoo_user }} group={{ odoo_user }} force=no
+  when: not sunflower_repo
+
+- name: Remove local.cfg if exist
+  file:
+    path: "{{ odoo_workdir }}/local.cfg"
+    state: absent
+  when: sunflower_repo
+
+- name: Touch local.cfg
+  become_user: "{{ odoo_user }}"
+  file:
+    path: "{{ odoo_workdir }}/local.cfg"
+    state: touch
+    force: yes
+  when: sunflower_repo
+
+- name: Config local.cfg
+  become_user: "{{ odoo_user }}"
+  lineinfile:
+    dest: "{{ odoo_workdir }}/local.cfg"
+    line: "{{ item }}"
+  with_items:
+    - "[buildout]"
+    - "extends = {{ buildout_config_file }}"
+    - " "
+    - "[odoo]"
+    - "options.admin_passwd = {{ odoo_config_admin_passwd }}"
+    - "options.db_host = {{ odoo_config_db_host }}"
+    - "options.db_name = {{ odoo_config_db_name }}"
+    - "options.db_port = {{ odoo_config_db_port }}"
+    - "options.db_user = {{ odoo_config_db_user }}"
+    - "options.db_password = {{ odoo_config_db_passwd }}"
+    - "options.xmlrpc_port = {{ odoo_config_xmlrpc_port }}"
+    - "options.longpolling_port = {{ odoo_config_longpolling_port }}"
+  when: sunflower_repo
+
+- name: Copy odoo CFG files to container
+  copy:
+    src: "{{ item }}"
+    dest: /home/{{ odoo_user }}/odoo/
+    force: yes
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+    mode: 0644
+  with_fileglob:
+    - odoo_cfg_files/*
+  when: sunflower_repo
 
 - name: Install buildout (run the bootstrap.py script)
   become: yes
@@ -31,9 +78,40 @@
   command: "{{ odoo_buildout_bootstrap_cmd }}"
   args:
     creates: "{{ odoo_buildout_bin_path }}"
+  when: run_bootstrap
+
+- name: Stop Odoo
+  service:
+    name: "{{ odoo_service }}"
+    state: stop
+  when: run_buildout == True and run_bootstrap == False
+  failed_when: false
+
+- name: Installing setuptools python library using Ansible pip module
+  pip:
+     name: setuptools
+     version: 38.1.0
+  when: run_buildout
+
+- name: "Download the pip requirements file for odoo {{ odoo_version }}"
+  become: yes
+  become_user: "{{ odoo_user }}"
+  get_url: url="https://raw.githubusercontent.com/odoo/odoo/{{ odoo_version }}/requirements.txt" dest="{{ odoo_workdir }}/requirements.txt"
+  when: run_buildout
+
+- name: "Install requirements for odoo {{ odoo_version }}"
+  become: yes
+  become_user: "{{ odoo_user }}"
+  pip:
+    requirements: "{{ odoo_workdir }}/requirements.txt"
+    state: present  
+  notify: Restart Odoo
+  failed_when: false
+  when: run_buildout
 
 - name: Run buildout
   become: yes
   become_user: "{{ odoo_user }}"
   command: "{{ odoo_buildout_bin_path }} -c {{ odoo_buildout_config_path }}"
   changed_when: False
+  when: run_buildout

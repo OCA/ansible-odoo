@@ -1,12 +1,25 @@
 ---
 
+- name: Restart LXD-Odoo
+  delegate_to: "{{ lxd_container_name }}"
+  service:
+    name: "{{ odoo_service }}"
+    state: restarted
+  when: odoo_init == True and lxd_type == True
+
 - name: Restart Odoo
   service:
     name: "{{ odoo_service }}"
     state: restarted
-  when: odoo_init == True
+  when: odoo_init == True and lxd_type == False
+
+- name: Reload LXD-Systemd
+  delegate_to: "{{ lxd_container_name }}"
+  systemd:
+    daemon-reload: yes
+  when: ansible_service_mgr == 'systemd' and lxd_type == True
 
 - name: Reload Systemd
   systemd:
     daemon-reload: yes
-  when: ansible_service_mgr == 'systemd'
+  when: ansible_service_mgr == 'systemd' and lxd_type == False

@@ -1,0 +1,33 @@
+---
+
+- name: Set variables depending on the platform and the version of Odoo
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}_Odoo-{{ odoo_version | int }}.yml"
+  tags:
+    - always
+
+- import_tasks: install.yml
+  tags:
+    - odoo
+    - odoo_install
+
+- import_tasks: wkhtmltox.yml
+  tags:
+    - odoo
+    - odoo_wkhtmltox
+
+- import_tasks: reportlab.yml
+  tags:
+    - odoo
+    - odoo_reportlab
+
+- import_tasks: postgresql.yml
+  tags:
+    - odoo
+    - odoo_postgresql
+
+- import_tasks: service.yml
+  tags:
+    - odoo
+    - odoo_service

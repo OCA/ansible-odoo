@@ -49,6 +49,9 @@
         key: "{{ lookup('file', item) }}"
       with_fileglob:
         - "{{ odoo_user_sshkeys }}"
-
   become: yes
   become_user: "{{ odoo_user }}"
+
+
+
+

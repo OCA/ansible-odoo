@@ -1,10 +1,62 @@
-ansible_ssh_pipelining: true
+host_user: odoo   #Your account on LXD host server
+odoo_user: ubuntu   #Your account to install odoo in odoo host
+lxd_type: True   #True for make a new LXD container and install odoo inside it, False to install odoo directly on server
+lxd_container_name: test   #The name you giv to a new LXD container
+new_lxd_container: True   #This condition to be carefull about exist containers when you run ansible-playbook
+lxd_step: True   #True to create a new LXD container, False if LXD container is exist and configure
+container_nameservers: " "   #The DNS address in your network
+postgresql_step: True   #True to install PostgreSQL and create a new database if new_postgresql_db==True, False to ignore that
+new_postgresql_db: True   #True to create a new database if postgresql_step==True, False to ignore that
+odoo_install_type: buildout   #Buildout or PIP or Standard
+buildout_step: True   #If you aim to create container with out odoo choose False
+odoo_version: 8.0   #
+sunflower_repo_url: "git@github.com:sunflowerit/custom-installations.git"   #The repository site link of odoo
+sunflower_repo: True   #True for Sunflower repository, False for other repository
+branch: 9.0-custom-standard   #The branch of Sunflower repository if you choose it
+github_account: anonymous   #Your account in github site
+github_account_name: anonymous   #Your account name in github site
+odoo_config_admin_passwd: admin   #Admin password for odoo
+odoo_config_db_host: localhost   #The name of server is hosts odoo database
+odoo_config_db_name: odoodatabase   #The name of odoo database
+odoo_config_db_user: "{{ odoo_user }}"   #The odoo account in PostgreSQL
+odoo_config_db_passwd: password   #The passowrd of odoo account in PostgreSQL
+odoo_config_db_user_righs: "NOCREATEDB,NOSUPERUSER"   #The right what odoo account in Postgresql have
+odoo_config_db_port: 5432   #The port of database into PostgreSQL
+odoo_config_xmlrpc_port: 8069   #The XMLRPC port of odoo
+odoo_config_longpolling_port: 8072   #The longpolling port of odoo
+odoo_service: odoo   #The name of odoo service in odoo OS host
+env_type: False   #True to install odoo into virtual environment, False to install odoo without virtual environment
+odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"   #The virtual environment folder
+odoo_buildout_version: 2.11.4   #The version of Buildout script
+odoo_workdir: "/home/{{ odoo_user }}/odoo"   #The folder where odoo files tree
+odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"   #The path where Buildout script
+odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"   #The path where Bootstrap script
+odoo_buildout_bootstrap_cmd: "{{ odoo_buildout_venv_path }}/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }} --buildout-version {{ odoo_buildout_version }}"   #The command to run bootstrap script
+buildout_config_file: odoo{{ odoo_version | int }}-standard.cfg   #The name of buildout config file
+odoo_buildout_config_path: "{{ odoo_workdir }}/{{ buildout_config_file }}"   #The path of buildout config file
+odoo_logdir: "/var/log/{{ odoo_user }}"   #The folder of odoo log files
+odoo_logfile: "{{ ansible_service_mgr != 'systemd' and ('/'.join([odoo_logdir, odoo_service]) + '.log') or ''}}"   #The odoo log file
+run_bootstrap: True   #True to run bootstrap into buildout step, false to ignore that
+app_before_buildout: True   #True to install recruitments pkg before run buildout, False to ignore that
+run_buildout: True   #True to run buildout into buildout step, False to ignore that
+odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"   #The path of script to start odoo
+app_after_buildout: True   #True to install recruitments pkg after run buildout, False to ignore that
+nginx_step: true   #True to include LXD container IP in NGINX proxy reserve, False to ignore that
+odoo_ip: 127.0.0.1   #The IP address of odoo
+nginx_domain: sunflowerodoo.nl   #The parent domain of LXD container URL
+nginx_subdomain: "{{ lxd_container_name }}"   #The subdomain to access odoo through NGINX domain
 
-odoo_install_type: standard     # standard, buildout
-odoo_version: 11.0
-odoo_service: odoo
-odoo_user: odoo
-odoo_user_passwd: "*"   # http://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+
+
+
+
+ansible_ssh_pipelining: True
+
+    # standard, buildout
+
+
+
+odoo_user_passwd: 11223344   # http://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
 odoo_user_update_password: always
 odoo_user_shell: /bin/bash
 odoo_user_system: False
@@ -12,9 +64,8 @@ odoo_init: True
 odoo_init_env: {}
     #VAR1: value1
     #VAR2: value2
-odoo_logdir: "/var/log/{{ odoo_user }}"
-odoo_logfile: "{{ ansible_service_mgr != 'systemd' and ('/'.join([odoo_logdir, odoo_service]) + '.log') or ''}}"
-odoo_workdir: "/home/{{ odoo_user }}/odoo"
+
+
 odoo_rootdir: "{{ odoo_install_type == 'buildout' and '/home/'+odoo_user+'/odoo/parts/odoo' or '/home/'+odoo_user+'/odoo/server' }}"
 
 # Project repository to deploy
@@ -44,19 +95,19 @@ odoo_force_config: True
 odoo_config_addons_path:
     - "/home/{{ odoo_user }}/odoo/server/{{ (odoo_version | int) < 10 and 'openerp' or 'odoo' }}/addons"
     - "/home/{{ odoo_user }}/odoo/server/addons"
-odoo_config_admin_passwd: admin
+
 odoo_config_auto_reload: False
 odoo_config_csv_internal_sep: ','
 odoo_config_data_dir: "/home/{{ odoo_user }}/.local/share/Odoo"
-odoo_config_db_host: False
+
 odoo_config_db_host_user: "{{ ansible_user }}"
 odoo_config_db_maxconn: 64
-odoo_config_db_name: False
-odoo_config_db_passwd: False
-odoo_config_db_port: False
+
+
+
 odoo_config_db_sslmode: prefer          # >= 11.0
 odoo_config_db_template: template1
-odoo_config_db_user: "{{ odoo_user }}"
+
 odoo_config_dbfilter: '.*'
 odoo_config_debug_mode: False           # <= 9.0
 odoo_config_pidfile: None
@@ -76,7 +127,7 @@ odoo_config_log_db: False
 odoo_config_log_level: info
 odoo_config_logfile: None
 odoo_config_logrotate: False
-odoo_config_longpolling_port: 8072
+
 odoo_config_osv_memory_age_limit: 1.0
 odoo_config_osv_memory_count_limit: False
 odoo_config_max_cron_threads: 2
@@ -96,7 +147,7 @@ odoo_config_without_demo: False
 odoo_config_workers: 0
 odoo_config_xmlrpc: True                # <= 10.0
 odoo_config_xmlrpc_interface: ''        # <= 10.0
-odoo_config_xmlrpc_port: 8069           # <= 10.0
+          # <= 10.0
 odoo_config_xmlrpcs: True               # <= 8.0
 odoo_config_xmlrpcs_interface: ''       # <= 8.0
 odoo_config_xmlrpcs_port: 8071          # <= 8.0
@@ -111,13 +162,10 @@ odoo_pip_requirements_url: "file:///home/{{ odoo_user }}/requirements.txt"
 odoo_pip_odoo_bin_path: "{{ odoo_pip_venv_path }}/bin/{{ (odoo_version | int) < 10 and 'odoo.py' or 'odoo' }}"
 
 # Buildout installation options (odoo_install_type == 'buildout')
-odoo_buildout_version: 2.10.0
-odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
-odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
-odoo_buildout_bootstrap_cmd: "{{ odoo_buildout_venv_path }}/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }} --buildout-version {{ odoo_buildout_version }}"
-odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"
-odoo_buildout_config_path: "{{ odoo_workdir }}/buildout.cfg"
-odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"
+
+
+
+
 odoo_buildout_extra_dependencies: []    # Extra Debian packages required
                                         # to run your Buildout recipe
 
@@ -140,3 +188,4 @@ odoo_user_ssh_known_hosts: []
 # FIXME: 'odoo_user_sshkeys' option (and the underlying task) needs refactoring
 # to handle the state of SSH public keys (present/absent).
 odoo_user_sshkeys: ""       # ./path/to/public_keys/*
+

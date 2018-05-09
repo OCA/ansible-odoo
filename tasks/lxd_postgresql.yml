@@ -1,0 +1,41 @@
+---
+
+- name: Ensure libpq-dev is installed
+  apt: pkg=libpq-dev state=present
+
+- name: Ensure python-psycopg2 is installed
+  apt: pkg=python-psycopg2 state=present
+
+- name: Ensure postgresql is installed
+  apt: pkg=postgresql state=present
+
+- name: Create "{{ odoo_config_db_user }}" user into postgresql
+  become_user: postgres
+  postgresql_user:
+    name: "{{ odoo_config_db_user }}"
+    password: "{{ odoo_config_db_passwd }}"
+    role_attr_flags: "{{ odoo_config_db_user_righs }}"
+  when: new_postgresql_db
+
+- name: Ensure database is created
+  become_user: postgres
+  postgresql_db: name="{{ odoo_config_db_name }}"
+             encoding=UTF-8
+             lc_collate=en_US.UTF-8
+             lc_ctype=en_US.UTF-8
+             state=present
+             owner="{{ odoo_config_db_user }}"
+             login_password="{{ odoo_config_db_passwd }}"
+             template=template0
+  when: new_postgresql_db
+
+- name: Ensure user has access to the database
+  become_user: postgres
+  postgresql_privs:
+    database: "{{ odoo_config_db_name }}"
+    state: present
+    privs: ALL
+    type: database
+    roles: "{{ odoo_config_db_user }}"
+    grant_option: yes
+  when: new_postgresql_db
