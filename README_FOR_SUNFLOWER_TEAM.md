@@ -39,11 +39,11 @@ this folder include variables preference allow tasks to choose between it occurr
 
 ## Example (Playbook)
 
-to use this ansible roles we must copy /etc/ansible folder to home directory then edit ansible.cfg file clear all lins in it and put this line:
+to use this ansible roles we must copy /etc/ansible folder to home directory then edit ansible.cfg file clear all lines in it and put this line:
 [defaults]
 inventory = hosts
 enable_task_debugger = True
-then edit hosts file clear all lins in it and put this line:
+then edit hosts file, clear all lines and put this line:
 localhost 
 
 then git clone our repository in roles folder:
@@ -61,7 +61,7 @@ then touch default.yml in ansible works directory and put this lines into it:
 then run this command
 ansible-playbook -K default.yml
 
-by this command ansible run in default variables so the roles will do that steps:
+by this command ansible runs in default variables so the roles will do the following steps:
 
 1- create LXD container: 'lxdcontainer' and put "lxdcontainer ansible_connection=lxd" line in ansible inventory hosts file 'hosts' to make 'lxdcontainer' available in ansible enviroment
 
@@ -152,9 +152,9 @@ by this command ansible run in default variables so the roles will do that steps
 
 22- try to reload nginx by this command: nginx -t && nginx -s reload
 
-now we can tchange ansible-playbook behavier by put some variable value in blaybook.yml
+now we can change ansible-playbook behavior by assigning to  some variables in blaybook.yml
 for example
-to make a new container and giv it simpleodoo10 and install odoo 10.0 inside this container from 10.0-custom-standard bransh and config nginx to make this container available in simpleodoo10.sunflowerodoo.nl we touch odoo_10_default.yml in ansible works directory and edit it to be:
+to make a new container and give it simpleodoo10 name and install odoo 10.0 inside this container from 10.0-custom-standard bransh and to config nginx to make this container available in simpleodoo10.sunflowerodoo.nl we touch odoo_10_default.yml in ansible working directory and edit it to be:
 ```yaml
 - name: Odoo
   hosts: localhost
