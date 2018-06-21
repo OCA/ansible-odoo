@@ -38,7 +38,7 @@
   become_user: "{{ odoo_user }}"
   pip:
     requirements: /home/{{ odoo_user }}/requirements.txt
-    extra_args: --upgrade
+    state: forcereinstall
     virtualenv: "{{ odoo_pip_venv_path }}"
   notify: Restart Odoo
 
