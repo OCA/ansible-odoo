@@ -62,6 +62,14 @@
   tags:
     - odoo_project
 
+- name: Create working dir directory
+  file: path={{ odoo_workdir }} state=directory
+        owner={{ odoo_user }} group={{ odoo_user }} force=yes
+
+- name: Create odoo server directory
+  file: path={{ odoo_rootdir }} state=directory
+        owner={{ odoo_user }} group={{ odoo_user }} force=yes
+
 - name: Create odoo data dir directory
   file: path={{ odoo_config_data_dir }} state=directory
         owner={{ odoo_user }} group={{ odoo_user }} force=yes
