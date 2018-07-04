@@ -69,6 +69,14 @@
 - name: Create odoo server directory
   file: path={{ odoo_rootdir }} state=directory
         owner={{ odoo_user }} group={{ odoo_user }} force=yes
+  when: odoo_install_type != 'pip'
+  tags:
+    - odoo_install_type_standard
+    - odoo_install_type_buildout
+
+- name: Create odoo config file directory
+  file: path={{ odoo_config_file_dir }} state=directory
+        owner={{ odoo_user }} group={{ odoo_user }} force=yes
 
 - name: Create odoo data dir directory
   file: path={{ odoo_config_data_dir }} state=directory

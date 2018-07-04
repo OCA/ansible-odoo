@@ -39,7 +39,8 @@ odoo_postgresql_extensions:
     - unaccent
 
 # Standard installation/configuration options (odoo_install_type == 'standard')
-odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
+odoo_config_file_dir: "/home/{{ odoo_user }}"
+odoo_config_file: "{{ odoo_config_file_dir }}/{{ odoo_service }}.conf"
 odoo_force_config: True
 odoo_config_addons_path:
     - "/home/{{ odoo_user }}/odoo/server/{{ (odoo_version | int) < 10 and 'openerp' or 'odoo' }}/addons"
