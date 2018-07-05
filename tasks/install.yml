@@ -67,7 +67,7 @@
         owner={{ odoo_user }} group={{ odoo_user }} force=yes
 
 - name: Create odoo server directory
-  file: path={{ odoo_rootdir }}/{{ odoo_service }} state=directory
+  file: path={{ odoo_rootdir }}/{{ odoo_service }}/server state=directory
         owner={{ odoo_user }} group={{ odoo_user }} force=yes
   when: odoo_install_type != 'pip'
   tags:
