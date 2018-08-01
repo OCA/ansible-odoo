@@ -8,7 +8,7 @@ User={{ odoo_user }}
 WorkingDirectory={{ odoo_workdir }}
 ExecStart={{ odoo_pip_odoo_bin_path }}{{ odoo_logfile and ' --logfile %s' % odoo_logfile }} --config {{ odoo_config_file }}
 KillMode=mixed
-{% for name, value in odoo_init_env.iteritems() %}
+{% for name, value in odoo_init_env.items() | list %}
 Environment={{ name }}={{ value }}
 {% endfor %}
 

@@ -25,7 +25,7 @@ USER={{ odoo_user }}
 export LOGNAME=$USER
 {% if odoo_init_env %}
 # Custom environment variables
-{% for name, value in odoo_init_env.iteritems() %}
+{% for name, value in odoo_init_env.items() | list %}
 export {{ name }}={{ value }}
 {% endfor %}
 {% endif %}
