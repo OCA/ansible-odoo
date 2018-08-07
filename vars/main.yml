@@ -9,6 +9,7 @@ odoo_required_tools:
     - mercurial
     - python-pip
     - python-psycopg2
+    - python-setuptools
     - xz-utils
 
 odoo_pypi_packages:
