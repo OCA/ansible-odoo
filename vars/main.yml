@@ -9,6 +9,7 @@ odoo_required_tools:
     - mercurial
     - python-pip
     - python-psycopg2
+    - xz-utils
 
 odoo_pypi_packages:
     - psycogreen
@@ -16,13 +17,14 @@ odoo_pypi_packages:
 odoo_buildout_venv_cmd: "virtualenv --no-setuptools {{ odoo_buildout_venv_path }}"
 odoo_pip_venv_cmd: "virtualenv {{ odoo_pip_venv_path }}"
 
-odoo_wkhtmltox_version: 0.12.4
+odoo_wkhtmltox_version: 0.12.5
 
 odoo_wkhtmltox_urls:
     # Debian packages
+    - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox_{{ odoo_wkhtmltox_version }}-1.{{ ansible_distribution_release }}_{{ odoo_debian_arch }}.deb
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
     - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
-    # generic tar.gz packages
+    # generic tar.xz packages
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-generic-{{ odoo_debian_arch }}.tar.xz
 
 odoo_wkhtmltox_dest: "/opt/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}"
