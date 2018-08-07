@@ -6,6 +6,7 @@
 - name: Download wkhtmltox
   get_url: url={{ item }}
            dest={{ odoo_wkhtmltox_dest }}
+           force=yes
   with_items: "{{ odoo_wkhtmltox_urls }}"
   ignore_errors: True
   when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False
