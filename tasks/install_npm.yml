@@ -14,7 +14,7 @@
 
 - name: Install NodeJS
   apt:  pkg="{{ odoo_nodejs_apt_package }}"
-        state=installed
+        state=present
         update_cache=yes
 
 - name: Install Odoo dependencies (npm)

@@ -6,7 +6,7 @@
 
 - name: Install build dependencies
   apt:  pkg={{ item }}
-        state=installed
+        state=present
         update_cache={{ odoo_apt_update_cache }}
         cache_valid_time={{ odoo_apt_cache_valid_time }}
   with_items: "{{ odoo_pip_build_dependencies }}"
