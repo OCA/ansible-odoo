@@ -105,8 +105,9 @@ odoo_wkhtmltox_depends:
 # Try Trusty's package if Xenial one is not found
 odoo_wkhtmltox_urls:
     # Debian packages
+    - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox_{{ odoo_wkhtmltox_version }}-1.{{ ansible_distribution_release }}_{{ odoo_debian_arch }}.deb
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-trusty-{{ odoo_debian_arch }}.deb
     - http://nightly.odoo.com/extra/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-{{ ansible_distribution_release }}-{{ odoo_debian_arch }}.deb
-    # generic tar.gz packages
+    # generic tar.xz packages
     - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox-{{ odoo_wkhtmltox_version }}_linux-generic-{{ odoo_debian_arch }}.tar.xz
