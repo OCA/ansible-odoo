@@ -7,10 +7,10 @@ Type=simple
 User={{ odoo_user }}
 WorkingDirectory={{ odoo_workdir }}
 {% if odoo_version | version_compare('10.0', '>=') %}
-ExecStart={{ odoo_rootdir }}/odoo-bin{{ odoo_logfile and ' --logfile %s' % odoo_logfile }} --config {{ odoo_config_file }}
+ExecStart={{ odoo_rootdir }}/{{ odoo_service }}/server/odoo-bin{{ odoo_logfile and ' --logfile %s' % odoo_logfile }} --config {{ odoo_config_file }}
 KillMode=mixed
 {% else %}
-ExecStart={{ odoo_rootdir }}/odoo.py{{ odoo_logfile and ' --logfile %s' % odoo_logfile }} --config {{ odoo_config_file }}
+ExecStart={{ odoo_rootdir }}/{{ odoo_service }}/server/odoo.py{{ odoo_logfile and ' --logfile %s' % odoo_logfile }} --config {{ odoo_config_file }}
 {% endif %}
 {% for name, value in odoo_init_env.items() | list %}
 Environment={{ name }}={{ value }}

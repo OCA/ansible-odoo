@@ -12,10 +12,10 @@ odoo_init: True
 odoo_init_env: {}
     #VAR1: value1
     #VAR2: value2
-odoo_logdir: "/var/log/{{ odoo_user }}"
+odoo_logdir: "/var/log"
 odoo_logfile: "{{ ansible_service_mgr != 'systemd' and ('/'.join([odoo_logdir, odoo_service]) + '.log') or ''}}"
-odoo_workdir: "/home/{{ odoo_user }}/odoo"
-odoo_rootdir: "{{ odoo_install_type == 'buildout' and '/home/'+odoo_user+'/odoo/parts/odoo' or '/home/'+odoo_user+'/odoo/server' }}"
+odoo_workdir: "/home/{{ odoo_user }}/{{ odoo_service }}"
+odoo_rootdir: "{{ '/home/'+odoo_user+'/'+odoo_service }}"
 
 # Project repository to deploy
 odoo_repo_type: git     # git or hg
@@ -39,7 +39,8 @@ odoo_postgresql_extensions:
     - unaccent
 
 # Standard installation/configuration options (odoo_install_type == 'standard')
-odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
+odoo_config_file_dir: "/home/{{ odoo_user }}"
+odoo_config_file: "{{ odoo_config_file_dir }}/{{ odoo_service }}.conf"
 odoo_force_config: True
 odoo_config_addons_path:
     - "/home/{{ odoo_user }}/odoo/server/{{ (odoo_version | int) < 10 and 'openerp' or 'odoo' }}/addons"
@@ -106,13 +107,13 @@ odoo_config_custom: {}
     #your_option2: value2
 
 # Pip installation options (odoo_install_type == 'pip')
-odoo_pip_venv_path: "{{ odoo_workdir }}/sandbox"
+odoo_pip_venv_path: "{{ odoo_workdir }}/{{ odoo_service }}/sandbox"
 odoo_pip_requirements_url: "file:///home/{{ odoo_user }}/requirements.txt"
 odoo_pip_odoo_bin_path: "{{ odoo_pip_venv_path }}/bin/{{ (odoo_version | int) < 10 and 'odoo.py' or 'odoo' }}"
 
 # Buildout installation options (odoo_install_type == 'buildout')
 odoo_buildout_version: 2.10.0
-odoo_buildout_venv_path: "{{ odoo_workdir }}/sandbox"
+odoo_buildout_venv_path: "{{ odoo_workdir }}/{{ odoo_service }}/sandbox"
 odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"
 odoo_buildout_bootstrap_cmd: "{{ odoo_buildout_venv_path }}/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }} --buildout-version {{ odoo_buildout_version }}"
 odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"

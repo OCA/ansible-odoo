@@ -16,7 +16,7 @@
 
 PATH=/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin
 WORKDIR={{ odoo_workdir }}
-DAEMON={{ odoo_rootdir }}/odoo.py
+DAEMON={{ odoo_rootdir }}/{{ odoo_service }}/server/odoo.py
 NAME={{ odoo_service }}
 DESC={{ odoo_service }}
 CONFIG={{ odoo_config_file }}

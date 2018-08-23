@@ -96,7 +96,7 @@ odoo_buildout_build_dependencies:
     - libwebp-dev
 
 odoo_buildout_venv_cmd: "virtualenv --no-setuptools --python=python3 {{ odoo_buildout_venv_path }}"
-odoo_pip_venv_cmd: "virtualenv --python=python3 {{ odoo_pip_venv_path }}"
+º: "virtualenv --python=python3 {{ odoo_pip_venv_path }}"
 
 odoo_wkhtmltox_version: 0.12.5
 
