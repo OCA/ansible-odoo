@@ -1,0 +1,17 @@
+lxd_host_user: odoo   #Your account on LXD host server
+lxd_host_name: testserver
+lxd_container_name: test   #The name you giv to a new LXD container
+new_lxd_container: True   #This condition to be carefull about exist containers when you run ansible-playbook
+lxd_force: False
+container_nameservers: " "   #The DNS address in your network
+odoo_user: ubuntu   #Your account to install odoo in odoo host
+odoo_user_passwd: 11223344 #We use this variable just when we create a new "Odoo System User". # http://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+odoo_user_update_password: always #We use this variable just when we choose odoo_user!="ubuntu".
+odoo_user_shell: /bin/bash #We use this variable to set system user password just when we choose odoo_user!="ubuntu".
+odoo_user_system: False #We use this variable just when we choose odoo_user!="ubuntu". and it affects just a new user, not an existing user.
+
+
+
+
+
+

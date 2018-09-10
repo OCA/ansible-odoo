@@ -1,0 +1,50 @@
+host_user: odoo   #Your account on LXD host server
+lxd_container_name: test   #The name you giv to a new LXD container
+lxd_force: False
+odoo_user: ubuntu   #Your account to install odoo in odoo host
+new_lxd_container: True   #This condition to be carefull about exist containers when you run ansible-playbook
+odoo_version: 8.0   #
+sunflower_repo_url: "git@github.com:sunflowerit/custom-installations.git"   #The repository site link of odoo
+branch: 9.0-custom-standard   #The branch of Sunflower repository if you choose it
+github_account: anonymous   #Your account in github site
+github_account_name: anonymous   #Your account name in github site
+odoo_config_admin_passwd: admin   #Admin password for odoo
+odoo_config_db_host: localhost   #The name of server is hosts odoo database
+odoo_config_db_name: odoodatabase   #The name of odoo database
+odoo_config_db_user: "{{ odoo_user }}"   #The odoo account in PostgreSQL
+odoo_config_db_passwd: password   #The passowrd of odoo account in PostgreSQL
+odoo_config_db_user_righs: "NOCREATEDB,NOSUPERUSER"   #The right what odoo account in Postgresql have
+odoo_config_db_port: 5432   #The port of database into PostgreSQL
+odoo_config_xmlrpc_port: 8069   #The XMLRPC port of odoo
+odoo_config_longpolling_port: 8072   #The longpolling port of odoo
+odoo_service: odoo   #The name of odoo service in odoo OS host
+odoo_buildout_version: 2.11.4   #The version of Buildout script
+odoo_workdir: "/home/{{ odoo_user }}/odoo"   #The folder where odoo files tree
+odoo_buildout_bin_path: "{{ odoo_workdir }}/bin/buildout"   #The path where Buildout script
+odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/bootstrap.py"   #The path where Bootstrap script
+odoo_buildout_bootstrap_cmd: "/usr/bin/python {{ odoo_buildout_bootstrap_path }} -c {{ odoo_buildout_config_path }} --buildout-version {{ odoo_buildout_version }}"   #The command to run bootstrap script
+buildout_config_file: odoo{{ odoo_version | int }}-standard.cfg   #The name of buildout config file
+odoo_buildout_config_path: "{{ odoo_workdir }}/local.cfg"   #The path of buildout config file
+odoo_logdir: "/var/log/{{ odoo_user }}"   #The folder of odoo log files
+odoo_logfile: "{{ ansible_service_mgr != 'systemd' and ('/'.join([odoo_logdir, odoo_service]) + '.log') or ''}}"   #The odoo log file
+run_bootstrap: True   #True to run bootstrap into buildout step, false to ignore that
+app_before_buildout: True   #True to install recruitments pkg before run buildout, False to ignore that
+run_buildout: True   #True to run buildout into buildout step, False to ignore that
+odoo_buildout_odoo_bin_path: "{{ odoo_workdir }}/bin/start_odoo"   #The path of script to start odoo
+app_after_buildout: True   #True to install recruitments pkg after run buildout, False to ignore that
+odoo_reportlab_font_url: http://www.reportlab.com/ftp/pfbfer.zip # Third party programs options
+odoo_init: True # To create init file to config odoo service
+odoo_config_server_wide_modules: None #We use this varible just when we odoo_init == True
+odoo_init_env: {} #We use this varible just when we odoo_init == True
+    #VAR1: value1 #We use this varible just when we odoo_init == True
+    #VAR2: value2 #We use this varible just when we odoo_init == True
+odoo_user_passwd: 11223344 #We use this variable just when we create a new "Odoo System User". # http://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+odoo_user_update_password: always #We use this variable just when we choose odoo_user!="ubuntu".
+odoo_user_shell: /bin/bash #We use this variable to set system user password just when we choose odoo_user!="ubuntu".
+odoo_user_system: False #We use this variable just when we choose odoo_user!="ubuntu". and it affects just a new user, not an existing user.
+
+
+
+
+
+

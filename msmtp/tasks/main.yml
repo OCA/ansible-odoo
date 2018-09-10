@@ -1,0 +1,104 @@
+---
+#KEY WORDS:
+#kw-check kw-message kw-ansible kw-install kw-configure kw-set_var
+#kw-networking kw-restart kw-user kw-system kw-ssh kw-postgresql
+#kw-backup kw-barman kw-rsnapshot kw-nginx kw-restart kw-install-pkg
+
+- debug:
+    msg: "'localhost' name isn't accebted as a container name in this ansible playbook."
+  when: lxd_container_name == "localhost"
+
+- meta: end_play
+  when: lxd_container_name == "localhost"
+
+# kw-ansible kw-check kw-set_var
+- name: check "{{ lxd_container_name }}" container if exist.
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+
+# kw-ansible kw-message
+- debug:
+    msg: The {{ lxd_container_name }} container is exist!
+  when: lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible
+- meta: end_play
+  when: new_lxd_container == True and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible kw-message
+- name: "               (^_^)         Be careful         (^_^)               ."
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c' then 'Enter' to continue.
+      - If you make it by mistake press 'q' then 'Enter' then correct new_lxd_container variable to be 'True' and chose another lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+- name: Get "{{ lxd_container_name }}" container IP.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}'"
+  register: container_ip
+
+- name: Ensure sendmail is installed
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=sendmail state=present
+
+- name: Ensure mailutils is installed
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=mailutils state=present
+
+- name: Ensure bsd-mailx is installed
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=bsd-mailx state=present
+
+- name: Ensure s-nail is installed
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=s-nail state=present
+
+- name: Ensure heirloom-mailx is installed
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=heirloom-mailx state=present
+
+- name: Ensure msmtp is installed
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=msmtp state=present
+
+- name: Ensure msmtp-mta is installed
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=msmtp-mta state=present
+
+- name: Config /etc/msmtprc .
+  delegate_to: "{{ lxd_container_name }}"
+  template:
+    src: msmtp.j2
+    dest: /etc/msmtprc
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Config /etc/mail.rc .
+  delegate_to: "{{ lxd_container_name }}"
+  lineinfile:
+    dest: /etc/mail.rc
+    line: "{{ item }}"
+  with_items:
+    - set sendmail="/usr/bin/msmtp"
+    - set from="helpdesk@sunflowerweb.nl"
+
+- name: Create mail body file .
+  delegate_to: "{{ lxd_container_name }}"
+  template:
+    src: mail.j2
+    dest: /root/mail
+    force: yes
+    owner: root
+    group: root
+    mode: 0600
+
+- name: send mail.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: cat /root/mail | mail -s {{ nginx_subdomain }}.{{ nginx_domain }} {{ recipent_email }}

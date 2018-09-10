@@ -1,0 +1,283 @@
+---
+#KEY WORDS:
+#kw-check kw-message kw-ansible kw-install kw-configure kw-set_var
+#kw-networking kw-restart kw-user kw-system kw-ssh kw-postgresql
+#kw-backup kw-barman kw-rsnapshot kw-nginx kw-restart kw-install-pkg
+
+- debug:
+    msg: "'localhost' name isn't accebted as a container name in this ansible playbook."
+  when: lxd_container_name == "localhost"
+
+- meta: end_play
+  when: lxd_container_name == "localhost"
+
+# kw-ansible kw-check kw-set_var
+- name: check "{{ lxd_container_name }}" container if exist.
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+
+# kw-ansible kw-message
+- debug:
+    msg: The {{ lxd_container_name }} container is exist!
+  when: lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible
+- meta: end_play
+  when: new_lxd_container == True and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible kw-message
+- name: "               (^_^)         Be careful         (^_^)               ."
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c' then 'Enter' to continue.
+      - If you make it by mistake press 'q' then 'Enter' then correct new_lxd_container variable to be 'True' and chose another lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+
+#   kw-networking kw-set_var
+- name: Get "{{ lxd_container_name }}" container IP.
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}'"
+  register: container_ip
+
+- name: Get "{{ lxd_container_name }}" container DHCP gateway.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ip route |grep '^default' | awk '/eth0/' | cut -d' ' -f3"
+  register: container_gateway
+
+- name: Remove postgres@{{ lxd_container_name }} ssh configuration from barman@{{ rsnapshot_server_name }}:/root/.ssh/config if exest.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  replace:
+    path: "{{ barman_home_directory }}/.ssh/config"
+    regexp: "(?=Host {{ lxd_container_name }}\n)(((.+\n)+)\n*?)(?=\n)"
+    replace: ""
+
+- name: Create postgres@{{ lxd_container_name }} ssh configuration in barman@{{ barman_server_name }}:{{ barman_home_directory }}/.ssh/config.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  blockinfile:
+    dest: "{{ barman_home_directory }}/.ssh/config"
+    state: present
+    marker: ""
+    block: |
+      Host {{ lxd_container_name }}
+      ForwardAgent yes
+      Hostname {{ container_ip.stdout }}
+      Port 22
+      User postgres
+      StrictHostKeyChecking no
+      ProxyCommand ssh {{ lxd_host_user }}@{{ lxd_host_ip }} nc %h 22
+
+- name: Generate port string from "{{ lxd_container_name }}" container IP value.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}' | cut -d '.' -f4"
+  register: ssh_port_string
+
+- block:
+    - name: Set ssh port vriable.
+      set_fact: ssh_port="900{{ ssh_port_string.stdout }}"
+      when: ssh_port_string.stdout <= 9
+
+    - name: Set ssh port vriable.
+      set_fact: ssh_port="90{{ ssh_port_string.stdout }}"
+      when: ssh_port_string.stdout <= 99
+
+    - name: Set ssh port vriable.
+      set_fact: ssh_port="9{{ ssh_port_string.stdout }}"
+      when: ssh_port_string.stdout >= 100
+
+- name: remove {{ ssh_port }} port forwarding role if exist in /etc/init.d/ssh_port_forwarding file.
+  become_user: root
+  delegate_to: "{{ barman_server_name }}"
+  lineinfile:
+    path: /etc/init.d/ssh_port_forwarding
+    state: absent
+    regexp: ^(su barman \-c "ssh \-fNT \-L {{ ssh_port }}\:)
+
+- name: Put {{ ssh_port }} port forwarding role in /etc/init.d/ssh_port_forwarding file.
+  become_user: root
+  delegate_to: "{{ barman_server_name }}"
+  lineinfile:
+    dest: "/etc/init.d/ssh_port_forwarding"
+    line: su barman -c "ssh -fNT -L {{ ssh_port }}:{{ container_ip.stdout }}:5432 {{ lxd_host_user }}@{{ lxd_host_ip }}"
+
+- name: Close {{ ssh_port }} port forwarding if opened.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  shell: |
+    kill $(ps aux | grep '[s]sh -fNT -L {{ ssh_port }}' | awk '{print $2}')
+  failed_when: false
+
+- name: Open {{ ssh_port }} port forwarding.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  shell: |
+    ssh -fNT -L {{ ssh_port }}:{{ container_ip.stdout }}:5432 {{ lxd_host_user }}@{{ lxd_host_ip }}
+
+# This block when barman_step is True
+# This block to configure barman and PostgreSQL for continues backup
+#     kw-barman kw-check kw-set_var
+- name: Check {{ postgres_home_directory }} if exists.
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  stat:
+    path: "{{ postgres_home_directory }}"
+  register: postgres_home_dir
+
+# kw-ansible kw-message kw-barman
+- debug:
+   msg: postgres home directory doesn't exist. Choose postgresql_step=True to install PostgreSQL, or correct {{ postgres_home_directory }} variable.
+  when: postgres_home_dir.stat.exists == False and postgresql_step == False
+
+# kw-ansible kw-barman
+- meta: end_play
+  when: postgres_home_dir.stat.exists == False and postgresql_step == False
+
+- name: Ensure rsync is installed on {{ lxd_container_name }}
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=rsync state=present
+
+- name: Create Barman users on PostgreSQL server
+  become_user: postgres
+  delegate_to: "{{ lxd_container_name }}"
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    role_attr_flags: "{{ item.role_attr_flags }}"
+#    port: "{{ postgresql_port|default(5432) }}"
+  with_items:
+    - { name: "{{ barman_superuser_user }}", password: "{{ barman_superuser_password }}", role_attr_flags: "SUPERUSER"   }
+    - { name: "{{ barman_streaming_user }}", password: "{{ barman_streaming_password }}", role_attr_flags: "REPLICATION" }
+
+- name: Add rule in pg_hba.conf on primary server to allow streaming replication
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  lineinfile:
+    dest: "/etc/postgresql/9.5/main/pg_hba.conf"
+    line: "host {{ item.database }} {{ item.user }} {{ container_gateway.stdout }}/32 md5"
+  with_items:
+    - { database: "postgres",    user: "{{ barman_superuser_user }}" }
+    - { database: "replication", user: "{{ barman_streaming_user }}" }
+
+# kw-postgresql kw-barman kw-configure
+- name: Configure postgres.conf on "{{ lxd_container_name }}" container to support Barman.
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  template:
+    src: postgresql.conf.j2
+    dest: /etc/postgresql/9.5/main/postgresql.conf
+    force: yes
+    owner: postgres
+    group: postgres
+    mode: 0644
+
+# kw-postgresql kw-baramn kw-configure kw-create kw-ssh
+- name: Create {{ postgres_home_directory }}/.ssh folder for postgres@{{ lxd_container_name }}.
+  become_user: postgres
+  delegate_to: "{{ lxd_container_name }}"
+  file:
+    path: "{{ postgres_home_directory }}/.ssh"
+    state: directory
+    mode: 0700
+    owner: postgres
+    group: postgres
+
+# kw-postgresql kw-barman kw-set_var kw-ssh
+- name: Get the barman@{{ barman_server_name }} ssh key.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  slurp:
+    src: '{{ barman_home_directory }}/.ssh/id_rsa.pub'
+  register: barman_ssh_key
+
+# kw-postgresql kw-barman kw-set_var kw-ssh
+- name: Extract barman@{{ barman_server_name }} ssh key.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  set_fact:
+    barman_register_ssh:
+      comment: "barman@{{ barman_server_ip }}"
+      key: "{{ barman_ssh_key.content | b64decode | trim }}"
+
+# kw-postgresql kw-barman kw-create kw-ssh
+- name: Deploy barman@{{ barman_server_name }} ssh key on postgres@{{ lxd_container_name }}.
+  become_user: postgres
+  delegate_to: "{{ lxd_container_name }}"
+  authorized_key:
+    user: 'postgres'
+    key: '{{ barman_register_ssh.key + " " + barman_register_ssh.comment }}'
+    state: 'present'
+
+# kw-postgresql kw-barman kw-create kw-ssh
+- name: Touch Known_hosts for postgres@{{ lxd_container_name }}.
+  become_user: postgres
+  delegate_to: "{{ lxd_container_name }}"
+  file:
+    path: "{{ postgres_home_directory }}/.ssh/known_hosts"
+    state: touch
+    mode: 0600
+    owner: postgres
+    group: postgres
+
+- name: remove {{ container_ip.stdout }} passwords if exist in {{ barman_home_directory }}/.pgpass file.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  lineinfile:
+    path: "{{ barman_home_directory }}/.pgpass"
+    state: absent
+    regexp: '^localhost\:{{ ssh_port }}\:'
+
+- name: Create .pgpass file entries to connect to PostgreSQL server
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  lineinfile:
+    dest: "{{ barman_home_directory }}/.pgpass"
+    state: present
+    line: "{{ item }}"
+  with_items:
+    - "localhost:{{ ssh_port }}:postgres:{{ barman_superuser_user }}:{{ barman_superuser_password }}"
+    - "localhost:{{ ssh_port }}:*:{{ barman_streaming_user }}:{{ barman_superuser_password }}"
+
+# kw-postgresql kw-barman kw-configure
+- name: Configure /etc/barmaan.d/{{ lxd_container_name }}.conf on "{{ barman_server_name }}" container.
+  become_user: root
+  delegate_to: "{{ barman_server_name }}"
+  template:
+    src: barman-server.conf.j2
+    dest: /etc/barman.d/{{ lxd_container_name }}.conf
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+
+# kw-postgresql kw-barman kw-configure kw-restart
+- name: Restart PostgreSQL service.
+  become_user: root
+  delegate_to: "{{ lxd_container_name }}"
+  service:
+    name: postgresql
+    state: restarted
+
+# kw-rsnapshot kw-configure
+- name: Configure "{{ lxd_container_name }}" backup in "{{ barman_server_name }}" cron.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  cron:
+    name: "{{ lxd_container_name }}"
+    minute: 13
+    hour: 6
+    job: "/usr/bin/barman backup {{ lxd_container_name }}"
+
+- name: Create the first backup.
+  become_user: barman
+  delegate_to: "{{ barman_server_name }}"
+  shell: |
+    barman switch-xlog --force --archive {{ lxd_container_name }}
+    barman backup {{ lxd_container_name }}

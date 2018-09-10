@@ -1,0 +1,20 @@
+lxd_container_name: test   #The name you giv to a new LXD container
+new_lxd_container: True #This condition to be carefull about exist containers when you run ansible-playbook/
+lxd_force: False
+odoo_config_db_name: odoodatabase
+odoo_config_db_user: ubuntu
+odoo_config_db_passwd: password
+odoo_version: 10.0
+odoo_user: ubuntu
+nginx_subdomain: test
+nginx_domain: sunflowerodoo.nl
+rsnapshot_server_name: localhost
+rsnapshot_backup_dir: /mnt/volume-fra1-01/backup/lxd/rsnapshot
+barman_server_name: localhost
+recipent_email: astheotherway@gmail.com
+
+
+
+
+
+

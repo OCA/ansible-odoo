@@ -1,0 +1,15 @@
+[{{ lxd_container_name }}]
+description = "{{ lxd_container_name }}"
+archiver = on
+streaming_archiver = on
+backup_method = postgres
+conninfo = host=localhost port={{ ssh_port }} user={{ barman_superuser_user }} dbname=postgres
+streaming_conninfo = host=localhost port={{ ssh_port }} user={{ barman_streaming_user }}
+ssh_command = ssh postgres@{{ container_ip.stdout }}
+retention_policy_mode = auto
+retention_policy = RECOVERY WINDOW OF 7 days
+wal_retention_policy = main
+streaming_backup_name = {{ lxd_container_name }}_streaming_backup
+streaming_archiver_name = {{ lxd_container_name }}_receive_wal
+immediate_checkpoint = false
+minimum_redundancy=2

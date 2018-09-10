@@ -1,0 +1,100 @@
+---
+#KEY WORDS:
+#kw-check kw-message kw-ansible kw-install kw-configure kw-set_var
+#kw-networking kw-restart kw-user kw-system kw-ssh kw-postgresql
+#kw-backup kw-barman kw-rsnapshot kw-nginx kw-restart kw-install-pkg
+
+- debug:
+    msg: "'localhost' name isn't accebted as a container name in this ansible playbook."
+  when: lxd_container_name == "localhost"
+
+- meta: end_play
+  when: lxd_container_name == "localhost"
+
+# kw-ansible kw-check kw-set_var
+- name: check "{{ lxd_container_name }}" container if exist.
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+
+# kw-ansible kw-message
+- debug:
+    msg: The {{ lxd_container_name }} container is exist!
+  when: lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible
+- meta: end_play
+  when: new_lxd_container == True and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible kw-message
+- name: "               (^_^)         Be careful         (^_^)               ."
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c' then 'Enter' to continue.
+      - If you make it by mistake press 'q' then 'Enter' then correct new_lxd_container variable to be 'True' and chose another lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-networking kw-set_var
+- name: Get "{{ lxd_container_name }}" container IP.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}'"
+  register: container_ip
+
+# This block when nginx_step is True
+# This block to configure NGINX proxy
+# kw-nginx kw-check kw-set_var
+- name: Check /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }} file if exists.
+  delegate_to: "{{ nginx_container_name }}"
+  stat:
+    path: /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+  register: stat_result
+
+# kw-nginx kw-set_var
+- name: Generate random string.
+  delegate_to: "{{ nginx_container_name }}"
+  shell: head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13 ; echo ''
+  register: random_string
+  when: stat_result.stat.exists
+
+# kw-nginx kw-configure kw-remove kw-create
+- name: Rename /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }} to /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ random_string.stdout }}
+  delegate_to: "{{ nginx_container_name }}"
+  shell: mv /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }} /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ random_string.stdout }}
+  when: stat_result.stat.exists
+
+# kw-nginx kw-configure kw-create
+- name: Touch /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+  delegate_to: "{{ nginx_container_name }}"
+  file:
+    path: /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+    state: touch
+
+- name: Create Letsencrypt certifecate to {{ nginx_subdomain }}.{{ nginx_domain }} .
+  delegate_to: "{{ nginx_container_name }}"
+  shell: certbot certonly --nginx -d {{ nginx_subdomain }}.{{ nginx_domain }} --force-renewal
+
+- name: Config /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }} .
+  delegate_to: "{{ nginx_container_name }}"
+  template:
+    src: nginx-proxy.j2
+    dest: /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+
+# kw-nginx kw-configure
+- name: Link /etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }} to /etc/nginx/sites-enabled/{{ nginx_subdomain }}.{{ nginx_domain }}
+  delegate_to: "{{ nginx_container_name }}"
+  file:
+    src: "/etc/nginx/sites-available/{{ nginx_subdomain }}.{{ nginx_domain }}"
+    dest: "/etc/nginx/sites-enabled/{{ nginx_subdomain }}.{{ nginx_domain }}"
+    state: link
+
+# kw-system kw-nginx kw-configure
+- name: Reload NGINX service.
+  delegate_to: "{{ nginx_container_name }}"
+  shell: nginx -t && nginx -s reload

@@ -1,0 +1,174 @@
+---
+#KEY WORDS:
+#kw-check kw-message kw-ansible kw-install kw-configure kw-set_var
+#kw-networking kw-restart kw-user kw-system kw-ssh kw-postgresql
+#kw-backup kw-barman kw-rsnapshot kw-nginx kw-restart kw-install-pkg
+
+- debug:
+    msg: "'localhost' name isn't accebted as a container name in this ansible playbook."
+  when: lxd_container_name == "localhost"
+
+- meta: end_play
+  when: lxd_container_name == "localhost"
+
+# kw-ansible kw-check kw-set_var
+- name: check "{{ lxd_container_name }}" container if exist.
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+
+# kw-ansible kw-message
+- debug:
+    msg: The {{ lxd_container_name }} container is exist!
+  when: lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible
+- meta: end_play
+  when: new_lxd_container == True and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible kw-message
+- name: "               (^_^)         Be careful         (^_^)               ."
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c' then 'Enter' to continue.
+      - If you make it by mistake press 'q' then 'Enter' then correct new_lxd_container variable to be 'True' and chose another lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-networking kw-set_var
+- name: Get "{{ lxd_container_name }}" container IP.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}'"
+  register: container_ip
+
+- name: Remove root@{{ lxd_container_name }} ssh configuration from root@{{ rsnapshot_server_name }}:/root/.ssh/config if exest.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  replace:
+    path: /root/.ssh/config
+    regexp: "(?=Host {{ lxd_container_name }}\n)(((.+\n)+)\n*?)(?=\n)"
+    replace: ""
+
+- name: Create root@{{ lxd_container_name }} ssh configuration in root@{{ rsnapshot_server_name }}:/root/.ssh/config.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  blockinfile:
+    dest: /root/.ssh/config
+    state: present
+    marker: ""
+    block: |
+      Host {{ lxd_container_name }}
+      ForwardAgent yes
+      Hostname {{ container_ip.stdout }}
+      Port 22
+      User root
+      StrictHostKeyChecking no
+      ProxyCommand ssh {{ lxd_host_user }}@{{ lxd_host_ip }} nc %h 22
+
+# kw-rsnapshot kw-set_var kw-ssh
+- name: Get the root@{{ rsnapshot_server_name }} ssh key.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  slurp:
+    src: '/root/.ssh/id_rsa.pub'
+  register: root_ssh_key
+
+# kw-rsnapshot kw-set_var kw-ssh
+- name: Extract root@{{ rsnapshot_server_name }} ssh key.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  set_fact:
+    rsnapshot_register_ssh:
+      comment: 'root@{{ container_ip.stdout }}'
+      key: '{{ root_ssh_key.content | b64decode | trim }}'
+
+# kw-rsnapshot kw-create kw-ssh
+- name: Deploy ssh key on root@{{ lxd_container_name }}.
+  delegate_to: "{{ lxd_container_name }}"
+  authorized_key:
+    user: 'root'
+    key: '{{ rsnapshot_register_ssh.key + " " + rsnapshot_register_ssh.comment }}'
+    key_options: 'no-pty,no-agent-forwarding,no-X11-forwarding,no-port-forwarding,command="ionice -c 3 nice /usr/local/lib/rrsync -ro /"'
+    state: 'present'
+
+# kw-rsnapshot kw-create kw-ssh
+- name: Touch Known_hosts for root@{{ rsnapshot_server_name }}.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  file:
+    path: /root/.ssh/known_hosts
+    state: touch
+    mode: 0600
+    owner: root
+    group: root
+
+#     kw-rsnapshot kw-check
+- name: Check if ~/.profile file exists on root@{{ lxd_container_name }}.
+  delegate_to: "{{ lxd_container_name }}"
+  stat:
+    path: ~/.profile
+  register: rsnapshot_register_root_profile
+
+#     kw-rsnapshot kw-create
+- name: Fix shell 'stdin is not a tty' issue for root@{{ lxd_container_name }}.
+  delegate_to: "{{ lxd_container_name }}"
+  lineinfile:
+    dest: '~/.profile'
+    regexp: 'mesg n$'
+    line: 'tty -s && mesg n'
+    state: 'present'
+    create: 'no'
+  when: rsnapshot_register_root_profile.stat.exists == True
+
+- name: Prepare rrsync script for secure rsync backups
+  delegate_to: "{{ lxd_container_name }}"
+  shell: gzip -d -c /usr/share/doc/rsync/scripts/rrsync.gz > /usr/local/lib/rrsync ;
+         chmod 0755 /usr/local/lib/rrsync
+#  args:
+#    creates: /usr/local/lib/rrsync
+
+- name: Ensure {{ rsnapshot_hosts_dir }}/{{ lxd_container_name }} folder is exists.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  file:
+    path: "{{ rsnapshot_hosts_dir }}/{{ lxd_container_name }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Configure {{ rsnapshot_hosts_dir }}/{{ lxd_container_name }}/exclude.txt on "{{ rsnapshot_server_name }}" server.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  template:
+    src: exclude.txt.j2
+    dest: "{{ rsnapshot_hosts_dir }}/{{ lxd_container_name }}/exclude.txt"
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configure {{ rsnapshot_hosts_dir }}/{{ lxd_container_name }}/include.txt on "{{ rsnapshot_server_name }}" server.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  template:
+    src: include.txt.j2
+    dest: "{{ rsnapshot_hosts_dir }}/{{ lxd_container_name }}/include.txt"
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Configure {{ rsnapshot_hosts_dir }}/{{ lxd_container_name }}/rsnapshot.conf on "{{ rsnapshot_server_name }}" server.
+  become_user: root
+  delegate_to: "{{ rsnapshot_server_name }}"
+  template:
+    src: rsnapshot.conf.j2
+    dest: "{{ rsnapshot_hosts_dir }}/{{ lxd_container_name }}/rsnapshot.conf"
+    force: yes
+    owner: root
+    group: root
+    mode: 0644
+

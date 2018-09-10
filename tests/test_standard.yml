@@ -1,9 +1,0 @@
----
-
-- hosts: localhost
-  become: yes
-  roles:
-    - ansible-odoo
-  vars:
-    odoo_install_type: standard
-    odoo_service: odoo-standard

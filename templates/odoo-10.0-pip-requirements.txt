@@ -1,2 +1,0 @@
-https://nightly.odoo.com/10.0/nightly/src/odoo_10.0.latest.zip
--e git+https://github.com/OCA/server-tools.git@10.0#egg=odoo10_addon_date_range&subdirectory=setup/date_range

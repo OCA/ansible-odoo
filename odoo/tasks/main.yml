@@ -1,0 +1,412 @@
+---
+#KEY WORDS:
+#kw-check kw-message kw-ansible kw-install kw-configure kw-set_var
+#kw-networking kw-restart kw-user kw-system kw-ssh kw-postgresql
+#kw-backup kw-barman kw-rsnapshot kw-nginx kw-restart kw-install-pkg
+
+- debug:
+    msg: "'localhost' name isn't accebted as a container name in this ansible playbook."
+  when: lxd_container_name == "localhost"
+
+- meta: end_play
+  when: lxd_container_name == "localhost"
+
+# kw-ansible kw-check kw-set_var
+- name: check "{{ lxd_container_name }}" container if exist.
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+
+# kw-ansible kw-message
+- debug:
+    msg: The {{ lxd_container_name }} container is exist!
+  when: lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible
+- meta: end_play
+  when: new_lxd_container == True and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible kw-message
+- name: "               (^_^)         Be careful         (^_^)               ."
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c' then 'Enter' to continue.
+      - If you make it by mistake press 'q' then 'Enter' then correct new_lxd_container variable to be 'True' and chose another lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-odoo kw-set_var
+- name: Set variables depending on the platform and the version of Odoo.
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/Odoo-{{ odoo_version | int }}.yml"
+
+#This block when app_before_buildout and buildout_step are True
+# This block to install some important packages for odoo
+- block:
+#   kw-odoo kw-install-pkg
+    - name: Install required tools.
+      delegate_to: "{{ lxd_container_name }}"
+      apt:  pkg={{ item }}
+            state=present
+            update_cache={{ odoo_apt_update_cache }}
+            cache_valid_time={{ odoo_apt_cache_valid_time }}
+      with_items: "{{ odoo_required_tools }}"
+
+#   kw-odoo kw-postgresql kw-instaall-pkg
+    - name: Ensure nl_NL.UTF-8 locale exists.
+      delegate_to: "{{ lxd_container_name }}"
+      locale_gen:
+        name: nl_NL.UTF-8
+        state: present
+
+#   kw-odoo kw-install-pkg install-pip
+    - name: install latest pip.
+      delegate_to: "{{ lxd_container_name }}"
+      easy_install:
+        name: pip
+        state: present
+
+#   kw-odoo kw-install-pkg
+    - name: Install build dependencies.
+      delegate_to: "{{ lxd_container_name }}"
+      apt:  pkg={{ item }}
+            state=present
+            update_cache={{ odoo_apt_update_cache }}
+            cache_valid_time={{ odoo_apt_cache_valid_time }}
+      with_items: "{{ odoo_buildout_build_dependencies }}"
+  when: app_before_buildout == True
+
+# This block when buildout_step is True
+# This block to clone our Odoo from https://github.com/sunflowerit/custom-installations
+- block:
+#   kw-odoo kw-ssh
+    - name: copy id_rsa file that added on sunflower github account befor.
+      delegate_to: "{{ lxd_container_name }}"
+      copy:
+        src: id_rsa
+        dest: /home/{{ odoo_user }}/.ssh/
+        force: yes
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        mode: 0600
+
+#   kw-odoo kw-create kw-ssh
+    - name: Touch Known_hosts for {{ odoo_user }}@{{ lxd_container_name }}.
+      delegate_to: "{{ lxd_container_name }}"
+      file:
+        path: /home/{{ odoo_user }}/.ssh/known_hosts
+        state: touch
+        mode: 0755
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+
+#   kw-odoo kw-create kw-ssh
+    - name: Add github key to known_hosts on {{ odoo_user }}@{{ lxd_container_name }}.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      shell: |
+        ssh-keygen -F github.com || ssh-keyscan github.com >> /home/{{ odoo_user }}/.ssh/known_hosts
+
+#   kw-odoo kw-configure kw-ssh
+    - name: Config "{{ github_account_name }}" github account for {{ odoo_user }}@{{ lxd_container_name }}.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      shell: |
+        git config --global user.email "{{ github_account }}"
+        git config --global user.name  "{{ github_account_name }}"
+
+#   kw-odoo kw-create
+    - name: Clone project from {{ sunflower_repo_url }}.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      git:
+        clone: yes
+        force: yes
+        repo: "{{ sunflower_repo_url }}"
+        version: "{{ branch }}"
+        dest: "{{ odoo_workdir }}"
+      notify: Restart {{ odoo_service }}
+
+# This block when buildout_step is True
+# This block to put and tune Odoo config files into container
+- block:
+#   kw-odoo kw-configure kw-remove
+    - name: Remove {{ odoo_workdir }}/local.cfg if exist.
+      delegate_to: "{{ lxd_container_name }}"
+      file:
+        path: "{{ odoo_workdir }}/local.cfg"
+        state: absent
+
+#   kw-odoo kw-configure kw-create
+    - name: Touch {{ odoo_workdir }}/local.cfg.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      file:
+        path: "{{ odoo_workdir }}/local.cfg"
+        state: touch
+        force: yes
+
+#   kw-odoo kw-configure kw-create
+    - name: Config {{ odoo_workdir }}/local.cfg.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      lineinfile:
+        dest: "{{ odoo_workdir }}/local.cfg"
+        line: "{{ item }}"
+      with_items:
+        - "[buildout]"
+        - "extends = {{ buildout_config_file }}"
+        - " "
+        - "[odoo]"
+        - "options.admin_passwd = {{ odoo_config_admin_passwd }}"
+        - "options.db_host = {{ odoo_config_db_host }}"
+        - "options.db_name = {{ odoo_config_db_name }}"
+        - "options.db_port = {{ odoo_config_db_port }}"
+        - "options.db_user = {{ odoo_config_db_user }}"
+        - "options.db_password = {{ odoo_config_db_passwd }}"
+        - "options.xmlrpc_port = {{ odoo_config_xmlrpc_port }}"
+        - "options.longpolling_port = {{ odoo_config_longpolling_port }}"
+
+#   kw-odoo kw-configure kw-create
+    - name: Copy roles/odoo/files/odoo_cfg_files/* to {{ odoo_workdir }}/
+      delegate_to: "{{ lxd_container_name }}"
+      copy:
+        src: "{{ item }}"
+        dest: /home/{{ odoo_user }}/odoo/
+        force: yes
+        owner: "{{ odoo_user }}"
+        group: "{{ odoo_user }}"
+        mode: 0644
+      with_fileglob:
+        - odoo_cfg_files/*
+
+#    - name: copy id_rsa file that added on sunflower github account befor.
+#      delegate_to: "{{ lxd_container_name }}"
+#      copy:
+#        src: id_rsa
+#        dest: /home/{{ odoo_user }}/.ssh/
+#        force: yes
+#        owner: "{{ odoo_user }}"
+#        group: "{{ odoo_user }}"
+#        mode: 0600
+
+
+# This block when buildout_step is true
+# This block to run buildout and install odoo
+- block:
+#   kw-odoo kw-install-odoo
+    - name: 'Install buildout (run: "{{ odoo_buildout_bootstrap_cmd }}").'
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      command: "{{ odoo_buildout_bootstrap_cmd }}"
+      args:
+        creates: "{{ odoo_buildout_bin_path }}"
+      when: run_bootstrap
+
+#   kw-odoo kw-configure
+    - name: Stop "{{ odoo_service }}" service.
+      delegate_to: "{{ lxd_container_name }}"
+      service:
+        name: "{{ odoo_service }}"
+        state: stop
+      when: run_buildout == True and run_bootstrap == False
+      failed_when: false
+
+#   kw-odoo kw-install-pip
+    - name: Installing setuptools python library using Ansible pip module.
+      delegate_to: "{{ lxd_container_name }}"
+      pip:
+         name: setuptools
+         version: 38.1.0
+      when: run_buildout
+
+#   kw-odoo kw-create kw-install-odoo
+    - name: Download the pip requirements file for odoo {{ odoo_version }}.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      get_url: url="https://raw.githubusercontent.com/odoo/odoo/{{ odoo_version }}/requirements.txt" dest="{{ odoo_workdir }}/requirements.txt"
+      when: run_buildout
+
+#   kw-odoo kw-install-odoo kw-install-pip
+    - name: Install requirements for odoo {{ odoo_version }}.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      pip:
+        requirements: "{{ odoo_workdir }}/requirements.txt"
+        state: present
+      notify: Restart {{ odoo_service }}
+      failed_when: false
+      when: run_buildout
+
+#   kw-odoo kw-install-odoo
+    - name: 'Run: "{{ odoo_buildout_bin_path }} -c {{ odoo_buildout_config_path }}"'
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      command: "{{ odoo_buildout_bin_path }} -c {{ odoo_buildout_config_path }}"
+      changed_when: False
+      when: run_buildout
+
+# This block when app_after_buildout and buildout_step are True and odoo_version >= 9
+# This block to install NodeJS
+- block:
+#   kw-system kw-odoo kw-configure kw-install-pkg
+    - name: Configure NodeJS APT repository signing key.
+      delegate_to: "{{ lxd_container_name }}"
+      apt_key:
+        url: "{{ item.url }}"
+        state: "{{ item.state }}"
+      with_items: "{{ odoo_nodejs_apt_keys | default([]) }}"
+
+#   kw-system kw-odoo kw-configure kw-install-pkg
+    - name: Configure NodeJS APT repository.
+      delegate_to: "{{ lxd_container_name }}"
+      apt_repository:
+        repo: "{{ item.repo }}"
+        state: "{{ item.state }}"
+      with_items: "{{ odoo_nodejs_apt_repositories | default([]) }}"
+
+#   kw-odoo kw-install-pkg
+    - name: Install NodeJS.
+      delegate_to: "{{ lxd_container_name }}"
+      apt:  pkg={{ odoo_nodejs_apt_package }}
+            state=present
+            update_cache=yes
+
+#   kw-odoo kw-install-pkg
+    - name: Install Odoo dependencies (npm).
+      delegate_to: "{{ lxd_container_name }}"
+      npm:  name={{ item.name }}
+            version={{ item.version }}
+            global=yes
+      with_items: "{{ odoo_npm_packages | default([]) }}"
+  when: (odoo_version | int) >= 9 and app_after_buildout == True
+
+# This block when app_after_buildout and buildout_step are True
+# This block to install wkhtmltox
+- block:
+#     kw-odoo kw-set_var
+    - name: Detect Debian architecture (i386 or amd64).
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      set_fact: odoo_debian_arch={{ '64' in ansible_architecture and 'amd64' or 'i386' }}
+
+#     kw-odoo kw-create kw-install-pkg
+    - name: Download wkhtmltox.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      get_url: url={{ item }}
+               dest={{ odoo_wkhtmltox_dest }}
+      with_items: "{{ odoo_wkhtmltox_urls }}"
+      ignore_errors: True
+      when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False
+      failed_when: false
+
+#     kw-odoo kw-check kw-install-pkg
+    - name: Check wkhtmltox package.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      stat: path={{ odoo_wkhtmltox_dest }}
+      register: odoo_wkhtmltox_pkg
+
+#     kw-odoo kw-install-pkg
+    - name: Install wkhtmltox dependencies.
+      delegate_to: "{{ lxd_container_name }}"
+      apt:  pkg={{ item }}
+      with_items: "{{ odoo_wkhtmltox_depends }}"
+      when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists
+
+#     kw-odoo kw-install-pkg
+    - name: Install wkhtmltox (Debian package).
+      delegate_to: "{{ lxd_container_name }}"
+      apt:
+        deb: "{{ odoo_wkhtmltox_dest }}"
+        force: yes
+      when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists and odoo_wkhtmltox_pkg.stat.mimetype in ['application/x-debian-package', 'application/vnd.debian.binary-package']
+
+#     kw-odoo kw-install-pkg
+    - name: Install wkhtmltox (generic package).
+      delegate_to: "{{ lxd_container_name }}"
+      unarchive:
+        remote_src: yes
+        src: "{{ odoo_wkhtmltox_dest }}"
+        dest: /usr/local
+        extra_opts: "--strip-components=1"
+        creates: /usr/local/bin/wkhtmltopdf
+      when: odoo_wkhtmltox_version is defined and odoo_wkhtmltox_version != False and odoo_wkhtmltox_pkg.stat.exists and odoo_wkhtmltox_pkg.stat.mimetype == 'application/x-xz'
+  when: app_after_buildout
+
+# This block when app_after_buildout and buildout_step are True
+# This block to install ReportLab
+- block:
+#   kw-odoo kw-create kw-install-pkg
+    - name: Download the ReportLab barcode fonts.
+      delegate_to: "{{ lxd_container_name }}"
+      get_url: url="{{ odoo_reportlab_font_url }}"
+               dest="/opt/pfbfer.zip"
+
+#   kw-odoo kw-create kw-install-pkg
+    - name: Create the font directory.
+      become_user: "{{ odoo_user }}"
+      delegate_to: "{{ lxd_container_name }}"
+      file: path="/home/{{ odoo_user }}/fonts" state=directory
+
+#   kw-odoo kw-install
+    - name: Install unzip.
+      delegate_to: "{{ lxd_container_name }}"
+      apt: name=unzip state=present
+
+#   kw-odoo kw-create kw-install
+    - name: Unzip the ReportLab fonts.
+      delegate_to: "{{ lxd_container_name }}"
+      unarchive: src="/opt/pfbfer.zip"
+                 dest="/home/{{ odoo_user }}/fonts"
+                 owner={{ odoo_user }}
+                 group={{ odoo_user }}
+                 mode="u=rwX,go=rX"
+                 copy=No
+                 creates="/home/{{ odoo_user }}/fonts/_abi____.pfb"
+  when: app_after_buildout
+
+# This block when buildout_step is True
+# This step to configire odoo service
+- block:
+#   kw-system kw-odoo kw-configure
+    - name: Generate "{{ odoo_service }}" init script (buildout)
+      delegate_to: "{{ lxd_container_name }}"
+      template: src=odoo-buildout.init dest=/etc/init.d/{{ odoo_service }}
+            owner=root group=root mode=0755
+            force=yes
+            backup=yes
+      when: ansible_service_mgr != 'systemd'
+      notify: Restart {{ odoo_service }}
+
+#   kw-system kw-odoo kw-configure
+    - name: Generate systemd "{{ odoo_service }}" service (buildout)
+      delegate_to: "{{ lxd_container_name }}"
+      template:
+            src=odoo-buildout.service
+            dest=/etc/systemd/system/{{ odoo_service }}.service
+            owner=root group=root mode=0755
+            force=yes
+            backup=yes
+      when: ansible_service_mgr == 'systemd'
+      notify:
+      - Reload Systemd
+      - Restart {{ odoo_service }}
+
+#   kw-system kw-odoo kw-configure
+    - name: Enable "{{ odoo_service }}" service.
+      delegate_to: "{{ lxd_container_name }}"
+      service: name={{ odoo_service }} enabled=yes state=started
+      when: odoo_init
+
+#   kw-system kw-odoo kw-configure
+    - name: Disable "{{ odoo_service }}" service.
+      delegate_to: "{{ lxd_container_name }}"
+      service: name={{ odoo_service }} enabled=no state=stopped
+      when: not odoo_init
+
+

@@ -1,0 +1,22 @@
+Hi
+We create {{ lxd_container_name }} container with this specifications:
+Container IP: {{ container_ip.stdout }}
+PostgreSQL database name: {{ odoo_config_db_name }}
+PostgreSQL user grant to database: {{ odoo_config_db_user }}
+postgreSQL password: {{ odoo_config_db_passwd }}
+Odoo version: {{ odoo_version }}
+Odoo user: {{ odoo_user }}
+Odoo work directory: /home/{{ odoo_user }}/odoo
+Link to access Odoo in this container: https://{{ nginx_subdomain }}.{{ nginx_domain }}
+The backup of this container on {{ rsnapshot_server_name }} server
+The path of packup on {{ rsnapshot_server_name }} server: {{ rsnapshot_backup_dir }}/{{ lxd_container_name }}
+The continues backup of PostgreSQL on {{ barman_server_name }} server
+Regards
+
+
+
+
+
+
+
+

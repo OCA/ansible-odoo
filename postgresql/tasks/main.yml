@@ -1,0 +1,94 @@
+---
+#KEY WORDS:
+#kw-check kw-message kw-ansible kw-install kw-configure kw-set_var
+#kw-networking kw-restart kw-user kw-system kw-ssh kw-postgresql
+#kw-backup kw-barman kw-rsnapshot kw-nginx kw-restart kw-install-pkg
+
+- debug:
+    msg: "'localhost' name isn't accebted as a container name in this ansible playbook."
+  when: lxd_container_name == "localhost"
+
+- meta: end_play
+  when: lxd_container_name == "localhost"
+
+# kw-ansible kw-check kw-set_var
+- name: check "{{ lxd_container_name }}" container if exist.
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+
+# kw-ansible kw-message
+- debug:
+    msg: The {{ lxd_container_name }} container is exist!
+  when: lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible
+- meta: end_play
+  when: new_lxd_container == True and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible kw-message
+- name: "               (^_^)         Be careful         (^_^)               ."
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c' then 'Enter' to continue.
+      - If you make it by mistake press 'q' then 'Enter' then correct new_lxd_container variable to be 'True' and chose another lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# This block when postgresql_step is True
+# This block to install PostgreSQL and config it to work with Odoo
+# kw-install-pkg
+- name: Ensure libpq-dev is installed.
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=libpq-dev state=present
+
+# kw-install-pkg
+- name: Ensure python-psycopg2 is installed.
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=python-psycopg2 state=present
+
+# kw-install-pkg kw-postgresql
+- name: Ensure PostgreSQL is installed.
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=postgresql state=present
+
+# kw-postgresql kw-configure kw-user kw-create
+- name: Create "{{ odoo_config_db_user }}" user into PostgreSQL.
+  become_user: postgres
+  delegate_to: "{{ lxd_container_name }}"
+  postgresql_user:
+    name: "{{ odoo_config_db_user }}"
+    password: "{{ odoo_config_db_passwd }}"
+    role_attr_flags: "{{ odoo_config_db_user_righs }}"
+  when: new_postgresql_db
+
+# kw-postgresql kw-configure kw-create
+- name: Ensure "{{ odoo_config_db_name }}" database is created.
+  become_user: postgres
+  delegate_to: "{{ lxd_container_name }}"
+  postgresql_db: name="{{ odoo_config_db_name }}"
+             encoding=UTF-8
+             lc_collate=en_US.UTF-8
+             lc_ctype=en_US.UTF-8
+             state=present
+             owner="{{ odoo_config_db_user }}"
+             login_password="{{ odoo_config_db_passwd }}"
+             template=template0
+  when: new_postgresql_db
+
+# kw-postgresql kw-configure kw-user
+- name: Ensure "{{ odoo_config_db_user }}" user has access to the "{{ odoo_config_db_name }}" database.
+  become_user: postgres
+  delegate_to: "{{ lxd_container_name }}"
+  postgresql_privs:
+    database: "{{ odoo_config_db_name }}"
+    state: present
+    privs: ALL
+    type: database
+    roles: "{{ odoo_config_db_user }}"
+    grant_option: yes
+  when: new_postgresql_db
+
+

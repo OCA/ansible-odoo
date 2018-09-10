@@ -1,0 +1,14 @@
+lxd_container_name: test   #The name you giv to a new LXD container
+new_lxd_container: True #This condition to be carefull about exist containers when you run ansible-playbook/
+lxd_force: False
+lxd_host_ip: 188.166.24.182
+lxd_host_user: odoo
+barman_server_name: localhost
+barman_server_ip: 10.10.10.20
+barman_home_directory: /mnt/volume-fra1-01/barman
+postgres_home_directory: /var/lib/postgresql
+odoo_config_db_port: 5432
+barman_superuser_user: bsuperuser
+barman_superuser_password: password
+barman_streaming_user: bstreaming
+barman_streaming_password: password

@@ -1,0 +1,9 @@
+lxd_container_name: test   #The name you giv to a new LXD container
+new_lxd_container: True   #This condition to be carefull about exist containers when you run ansible-playbook
+lxd_force: False
+odoo_user: ubuntu   #Your account to install odoo in odoo host
+new_postgresql_db: True   #True to create a new database if postgresql_step==True, False to ignore that
+odoo_config_db_name: odoodatabase   #The name of odoo database
+odoo_config_db_user: "{{ odoo_user }}"   #The odoo account in PostgreSQL
+odoo_config_db_passwd: password   #The passowrd of odoo account in PostgreSQL
+odoo_config_db_user_righs: "NOCREATEDB,NOSUPERUSER"   #The right what odoo account in Postgresql have

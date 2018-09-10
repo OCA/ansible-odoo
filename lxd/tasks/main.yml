@@ -1,0 +1,174 @@
+---
+#KEY WORDS:
+#kw-check kw-message kw-ansible kw-install kw-configure kw-set_var
+#kw-networking kw-restart kw-user kw-system kw-ssh kw-postgresql
+#kw-backup kw-barman kw-rsnapshot kw-nginx kw-restart kw-install-pkg
+
+- debug:
+    msg: "'localhost' name isn't accebted as a container name in this ansible playbook."
+  when: lxd_container_name == "localhost"
+
+- meta: end_play
+  when: lxd_container_name == "localhost"
+
+# kw-ansible kw-check kw-set_var
+- name: check "{{ lxd_container_name }}" container if exist.
+  shell: "lxc list |grep ' {{ lxd_container_name }} ' |cut -d'|' -f6 | awk '{print $1}'"
+  register: lxd_state
+
+# kw-ansible kw-message
+- debug:
+    msg: The {{ lxd_container_name }} container is exist!
+  when: lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible
+- meta: end_play
+  when: new_lxd_container == True and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# kw-ansible kw-message
+- name: "               (^_^)         Be careful         (^_^)               ."
+  debug:
+    msg:
+      -      Warning           Warning           Warning            Warning
+      - You chose 'new_lxd_container == False', That mean ansible will overwrite the exist container.
+      - If you are sure press 'c' then 'Enter' to continue.
+      - If you make it by mistake press 'q' then 'Enter' then correct new_lxd_container variable to be 'True' and chose another lxd_container_name, then rerun ansible-playbook.
+  failed_when: True
+  ignore_errors: True
+  when: new_lxd_container == False and lxd_state.stdout == "PERSISTENT" and lxd_force == False
+
+# This block when lxd_step is True
+# This block create LXD container with basic specifications.
+# kw-create
+- name: Create "{{ lxd_container_name }}" container.
+  delegate_to: "{{ lxd_host_name }}"
+  lxd_container:
+   name: "{{ lxd_container_name }}"
+   state: started
+   source:
+     type: image
+     mode: pull
+     server: https://images.linuxcontainers.org
+     protocol: lxd
+     alias: ubuntu/xenial/amd64
+   profiles: ["default"]
+   wait_for_ipv4_addresses: true
+   timeout: 600
+
+# kw-ansible
+- name: Add new "{{ lxd_container_name }}" name in hosts file.
+  lineinfile:
+    dest: hosts
+#    line: "{{ lxd_container_name }} ansible_connection=lxd"
+    line: "{{ lxd_container_name }} ansible_connection=lxd ansible_host={{ lxd_host_name }}:{{ lxd_container_name }}"
+
+# kw-ansible
+- name: Refresh hosts
+  meta: refresh_inventory
+
+# kw-check kw-set_var
+- name: Check python is installed in "{{ lxd_container_name }}" container.
+  delegate_to: "{{ lxd_container_name }}"
+  connection: lxd
+  raw: dpkg -s python
+  register: python_install_check
+  failed_when: python_install_check.rc not in [0, 1]
+  changed_when: false
+
+# kw-install-pkg
+- name: Install python in "{{ lxd_container_name }}" container.
+  delegate_to: "{{ lxd_container_name }}"
+  raw: apt-get install -y python
+  when: python_install_check.rc == 1
+
+# kw-networking kw-set_var
+- name: Get "{{ lxd_container_name }}" container DHCP IP.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f2 | awk '{print $1}'"
+  register: container_ip
+
+# kw-networking kw-set_var
+- name: Get "{{ lxd_container_name }}" container DHCP Broadcast.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f3 | awk '{print $1}'"
+  register: container_broadcast
+
+# kw-networking kw-set_var
+- name: Get "{{ lxd_container_name }}" container DHCP Netmask.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ifconfig eth0 | grep 'inet addr' | cut -d ':' -f4 | awk '{print $1}'"
+  register: container_netmask
+
+# kw-networking kw-set_var
+- name: Get "{{ lxd_container_name }}" container DHCP gateway.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: "/sbin/ip route |grep '^default' | awk '/eth0/' | cut -d' ' -f3"
+  register: container_gateway
+
+# kw-system kw-networking kw-configure kw-remove
+- name: Remove /etc/network/interfaces.
+  delegate_to: "{{ lxd_container_name }}"
+  file:
+    path: /etc/network/interfaces
+    state: absent
+
+# kw-system kw-networking kw-configure kw-create
+- name: Touch /etc/network/interfaces.
+  delegate_to: "{{ lxd_container_name }}"
+  file:
+    path: /etc/network/interfaces
+    state: touch
+
+# kw-system kw-networking kw-configure
+- name: Config /etc/network/interfaces.
+  delegate_to: "{{ lxd_container_name }}"
+  lineinfile:
+    dest: /etc/network/interfaces
+    line: "{{ item }}"
+  with_items:
+    - auto lo
+    - iface lo inet loopback
+    - " "
+    - auto eth0
+    - iface eth0 inet static
+    - "address {{ container_ip.stdout }}"
+    - "netmask {{ container_netmask.stdout }}"
+    - "broadcast {{ container_broadcast.stdout }}"
+    - "gateway {{ container_gateway.stdout }}"
+    - "dns-nameservers {{ container_gateway.stdout }} {{ container_nameservers }}"
+
+# kw-system kw-networking kw-configure kw-restart
+- name: Restart networking service.
+  delegate_to: "{{ lxd_container_name }}"
+  shell: |
+    ifdown eth0
+    ifup eth0
+    service networking restart
+
+# kw-system kw-user kw-create
+- name: Add "{{ odoo_user }}" system user into "{{ lxd_container_name }}" container OS.
+  delegate_to: "{{ lxd_container_name }}"
+  user:
+    name: "{{ odoo_user }}"
+    shell: "{{ odoo_user_shell }}"
+    password: "{{ odoo_user_passwd }}"
+    update_password: "{{ odoo_user_update_password }}"
+    system: "{{ odoo_user_system }}"
+  tags:
+    - odoo_user
+  when: odoo_user != "ubuntu"
+
+# kw-user kw-create kw-ssh
+- name: Ensure /home/{{ odoo_user }}/.ssh folder is exists.
+  delegate_to: "{{ lxd_container_name }}"
+  file:
+    path: /home/{{ odoo_user }}/.ssh
+    state: directory
+    mode: 0700
+    owner: "{{ odoo_user }}"
+    group: "{{ odoo_user }}"
+
+# kw-install-pkg
+- name: Ensure openssh-server is installed.
+  delegate_to: "{{ lxd_container_name }}"
+  apt: pkg=openssh-server state=present

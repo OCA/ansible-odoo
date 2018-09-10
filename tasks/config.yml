@@ -1,8 +1,0 @@
----
-
-- name: Generate Odoo configuration file
-  template: src=odoo-{{ odoo_version }}.conf dest={{ odoo_config_file }}
-        owner={{ odoo_user }} group={{ odoo_user }} mode=0600
-        force={{ odoo_force_config and 'yes' or 'no' }}
-        backup=yes
-  notify: Restart Odoo

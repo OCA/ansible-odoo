@@ -1,0 +1,9 @@
+lxd_host_user: odoo
+lxd_host_ip: 188.166.24.182
+lxd_container_name: test   #The name you giv to a new LXD container
+new_lxd_container: True   #This condition to be carefull about exist containers when you run ansible-playbook
+lxd_force: False
+rsnapshot_server_name: rsnapshot
+rsnapshot_server_ip: 10.10.10.70
+rsnapshot_hosts_dir: /etc/rsnapshot/hosts
+rsnapshot_backup_dir: /mnt/volume-fra1-01/backup/lxd/rsnapshot

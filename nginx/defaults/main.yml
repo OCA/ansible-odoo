@@ -1,0 +1,13 @@
+lxd_container_name: test   #The name you giv to a new LXD container
+new_lxd_container: True   #This condition to be carefull about exist containers when you run ansible-playbook
+nginx_container_name: nginx-proxy
+lxd_force: False
+odoo_config_xmlrpc_port: 8069   #The XMLRPC port of odoo
+odoo_config_longpolling_port: 8072   #The longpolling port of odoo
+nginx_domain: sunflowerodoo.nl   #The parent domain of LXD container URL
+nginx_subdomain: "{{ lxd_container_name }}"   #The subdomain to access odoo through NGINX domain
+
+
+
+
+

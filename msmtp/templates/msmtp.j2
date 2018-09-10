@@ -1,0 +1,23 @@
+# From this line to the first 'account X' line are settings for all accounts
+defaults
+auth on
+tls on
+# This is where the TLS CERTs reside
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile /var/mail/log/msmtp.log
+# With tls_starttls on it will be a clear session and then upgrade to TLS
+# using the STARTTLS command. If set to 'off' then the whole session is
+# encrypted inside a TLS session (SMTPS)
+tls_starttls off
+# This is the log file - comment it out to stop it collecting
+# Authentication must be used for sending
+# Each account will use a different method
+## Account ##
+account axc
+host mail.axc.nl
+port 465
+user helpdesk@sunflowerweb.nl
+from helpdesk@sunflowerweb.nl
+password {{ mail_password }}
+
+account default: axc

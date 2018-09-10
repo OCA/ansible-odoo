@@ -1,0 +1,14 @@
+---
+
+- name: Restart {{ odoo_service }}
+  delegate_to: "{{ lxd_container_name }}"
+  service:
+    name: "{{ odoo_service }}"
+    state: restarted
+  when: odoo_init
+
+- name: Reload Systemd
+  delegate_to: "{{ lxd_container_name }}"
+  systemd:
+    daemon-reload: yes
+  when: ansible_service_mgr == 'systemd'
