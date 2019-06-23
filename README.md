@@ -66,11 +66,11 @@ Standard installation with mirrored *Enterprise* and (custom, external) *addons*
 
       # Odoo Enterprise
       odoo_enterprise_repo_url: git@example.com:customer/enterprise.git
-      odoo_enterprise_repo_rev: 12.0
+      odoo_enterprise_repo_rev: 11.0
 
       # Odoo Addons
       odoo_addons_repo_url: git@example.com:customer/addons.git
-      odoo_addons_repo_rev: 12.0
+      odoo_addons_repo_rev: 11.0
 
       odoo_config_addons_path:
         - "/home/{{ odoo_user }}/odoo/enterprise"
