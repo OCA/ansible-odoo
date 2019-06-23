@@ -52,6 +52,34 @@ the same host):
 With the standard installation type you configure Odoo with the available
 `odoo_config_*` options.
 
+Standard installation with mirrored *Enterprise* and (custom, external) *addons*
+(assuming that PostgreSQL is installed and running on the same host):
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  become: yes
+  roles:
+    - role: odoo
+      odoo_version: 11.0
+      odoo_config_admin_passwd: SuPerPassWorD
+
+      # Odoo Enterprise
+      odoo_enterprise_repo_url: git@example.com:customer/enterprise.git
+      odoo_enterprise_repo_rev: 12.0
+
+      # Odoo Addons
+      odoo_addons_repo_url: git@example.com:customer/addons.git
+      odoo_addons_repo_rev: 12.0
+
+      odoo_config_addons_path:
+        - "/home/{{ odoo_user }}/odoo/enterprise"
+        - "/home/{{ odoo_user }}/odoo/addons/custom"
+        - "/home/{{ odoo_user }}/odoo/addons/external"
+        - "/home/{{ odoo_user }}/odoo/server/odoo/addons"
+        - "/home/{{ odoo_user }}/odoo/server/addons"
+```
+
 Standard installation but with PostgreSQL installed on a remote host (and
 available from your Ansible inventory):
 

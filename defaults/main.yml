@@ -29,6 +29,32 @@ odoo_repo_update: True  # Update the working copy or not. This option is
 odoo_repo_depth: 1      # Set to 0 to clone the full history (slower)
                         # (this option is not supported with hg)
 
+# Enterprise repository to deploy
+odoo_enterprise_dir: "/home/{{ odoo_user }}/odoo/enterprise/"
+odoo_enterprise_repo_type: git     # git or hg
+odoo_enterprise_repo_url: False
+odoo_enterprise_repo_dest: "{{ odoo_install_type == 'buildout' and odoo_workdir or odoo_enterprise_dir }}"
+odoo_enterprise_repo_rev: "{{ odoo_version }}"
+odoo_enterprise_repo_update: True  # Update the working copy or not. This option is
+                        # ignored on the first run (a checkout of the working
+                        # copy is always processed on the given revision)
+                        # WARNING: uncommited changes will be discarded!
+odoo_enterprise_repo_depth: 1      # Set to 0 to clone the full history (slower)
+                        # (this option is not supported with hg)
+
+# Addons repository to deploy
+odoo_addons_dir: "/home/{{ odoo_user }}/odoo/addons/"
+odoo_addons_repo_type: git     # git or hg
+odoo_addons_repo_url: False
+odoo_addons_repo_dest: "{{ odoo_install_type == 'buildout' and odoo_workdir or odoo_addons_dir }}"
+odoo_addons_repo_rev: "{{ odoo_version }}"
+odoo_addons_repo_update: True  # Update the working copy or not. This option is
+                        # ignored on the first run (a checkout of the working
+                        # copy is always processed on the given revision)
+                        # WARNING: uncommited changes will be discarded!
+odoo_addons_repo_depth: 1      # Set to 0 to clone the full history (slower)
+                        # (this option is not supported with hg)
+
 # Third party programs options
 odoo_reportlab_font_url: http://www.reportlab.com/ftp/pfbfer.zip
 
