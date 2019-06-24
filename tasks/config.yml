@@ -1,8 +1,19 @@
 ---
 
+- name: Grep admin_passwd (to preserve) from current Odoo configuration file
+  shell: grep admin_passwd /home/{{ odoo_user }}/odoo.conf
+  register: grep_admin_passwd
+  ignore_errors: true
+
 - name: Generate Odoo configuration file
   template: src=odoo-{{ odoo_version }}.conf dest={{ odoo_config_file }}
         owner={{ odoo_user }} group={{ odoo_user }} mode=0600
         force={{ odoo_force_config and 'yes' or 'no' }}
         backup=yes
+
+- name: Preserve/replace previous admin_passwd in Odoo configuration file
+  lineinfile:
+    path: /home/{{ odoo_user }}/odoo.conf
+    regexp: '^admin_passwd.*='
+    line: "{{ grep_admin_passwd.stdout }}"
   notify: Restart Odoo
