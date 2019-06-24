@@ -52,8 +52,17 @@ the same host):
 With the standard installation type you configure Odoo with the available
 `odoo_config_*` options.
 
-Standard installation with mirrored *Enterprise* and (custom, external) *addons*
-(assuming that PostgreSQL is installed and running on the same host):
+Standard installation with Enterprise and addons (assuming that PostgreSQL is
+installed and running on the same host)
+
+- `odoo_enterprise_repo`: Odoo Enterprise (mirrored)
+- `odoo_addons_repo`: Project/customer addons (custom, external)
+- `odoo_addons_debian_packages`: Debian/apt packages required by addons.
+
+Consideration:
+It's also possible to put Python packages into the `{{ odoo_addons_dir }}/requirements.txt` file.
+So consider whether to install Python packages by
+either the PyPi requirements or `odoo_addons_debian_packages`
 
 ```yaml
 - name: Odoo
@@ -78,6 +87,10 @@ Standard installation with mirrored *Enterprise* and (custom, external) *addons*
         - "/home/{{ odoo_user }}/odoo/addons/external"
         - "/home/{{ odoo_user }}/odoo/server/odoo/addons"
         - "/home/{{ odoo_user }}/odoo/server/addons"
+
+      odoo_addons_debian_packages:
+        - python3-openpyxl
+        - python3-numpy
 ```
 
 Standard installation but with PostgreSQL installed on a remote host (and

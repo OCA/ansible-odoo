@@ -134,3 +134,8 @@
   tags:
     - odoo
     - odoo_packages
+
+- name: Install addons dependencies
+  import_tasks: install_addons_dependencies.yml
+  tags:
+    - odoo_packages
