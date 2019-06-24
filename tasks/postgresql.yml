@@ -10,19 +10,20 @@
     - name: PostgreSQL - Add the Odoo user
       postgresql_user: name={{ odoo_config_db_user }}
                        role_attr_flags={{ odoo_postgresql_user_role_attr }}
-      when: odoo_postgresql_set_user
+      when: odoo_postgresql_set_user and odoo_install_postgresql
 
     - name: PostgreSQL - Set the Odoo user password
       postgresql_user: name={{ odoo_config_db_user }}
                        password={{ odoo_config_db_passwd }}
       when: odoo_config_db_passwd is defined and odoo_config_db_passwd
-            and odoo_postgresql_set_user
+            and odoo_postgresql_set_user and odoo_install_postgresql
 
     - name: PostgreSQL - Activate some extensions on the 'template1' database
       postgresql_ext:
         name: "{{ item }}"
         db: template1
       with_items: "{{ odoo_postgresql_extensions }}"
+      when: odoo_install_postgresql
 
   delegate_to: "{{ odoo_postgresql_delegate_to }}"
   remote_user: "{{ odoo_postgresql_remote_user }}"

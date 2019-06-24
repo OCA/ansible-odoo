@@ -33,6 +33,7 @@ odoo_repo_depth: 1      # Set to 0 to clone the full history (slower)
 odoo_reportlab_font_url: http://www.reportlab.com/ftp/pfbfer.zip
 
 # Tasks related to PostgreSQL
+odoo_install_postgresql: True
 odoo_postgresql_set_user: True
 odoo_postgresql_user_role_attr: CREATEDB,NOSUPERUSER
 odoo_postgresql_extensions:
