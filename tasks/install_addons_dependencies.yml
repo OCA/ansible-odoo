@@ -1,0 +1,25 @@
+---
+
+- name: Addons - Install Debian/apt dependencies
+  apt:  pkg={{ item }}
+        state=present
+        update_cache={{ odoo_apt_update_cache }}
+        cache_valid_time={{ odoo_apt_cache_valid_time }}
+  with_items: "{{ odoo_addons_debian_packages }}"
+  when: odoo_addons_debian_packages is defined
+  tags:
+    - odoo_packages
+
+- name: Addons - Check PyPi requirements file exist
+  stat:
+    path: "{{ odoo_addons_dir }}/requirements.txt"
+  register: addons_requirements_file
+  tags:
+    - odoo_packages
+
+- name: Addons - Install PyPi dependencies using requirements file
+  pip:
+    requirements: "file://{{ odoo_addons_dir }}/requirements.txt"
+  when: addons_requirements_file.stat.exists
+  tags:
+    - odoo_packages

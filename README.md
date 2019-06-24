@@ -52,6 +52,47 @@ the same host):
 With the standard installation type you configure Odoo with the available
 `odoo_config_*` options.
 
+Standard installation with Enterprise and addons (assuming that PostgreSQL is
+installed and running on the same host)
+
+- `odoo_enterprise_repo`: Odoo Enterprise (mirrored)
+- `odoo_addons_repo`: Project/customer addons (custom, external)
+- `odoo_addons_debian_packages`: Debian/apt packages required by addons.
+
+Consideration:
+It's also possible to put Python packages into the `{{ odoo_addons_dir }}/requirements.txt` file.
+So consider whether to install Python packages by
+either the PyPi requirements or `odoo_addons_debian_packages`
+
+```yaml
+- name: Odoo
+  hosts: odoo_server
+  become: yes
+  roles:
+    - role: odoo
+      odoo_version: 11.0
+      odoo_config_admin_passwd: SuPerPassWorD
+
+      # Odoo Enterprise
+      odoo_enterprise_repo_url: git@example.com:customer/enterprise.git
+      odoo_enterprise_repo_rev: 11.0
+
+      # Odoo Addons
+      odoo_addons_repo_url: git@example.com:customer/addons.git
+      odoo_addons_repo_rev: 11.0
+
+      odoo_config_addons_path:
+        - "/home/{{ odoo_user }}/odoo/enterprise"
+        - "/home/{{ odoo_user }}/odoo/addons/custom"
+        - "/home/{{ odoo_user }}/odoo/addons/external"
+        - "/home/{{ odoo_user }}/odoo/server/odoo/addons"
+        - "/home/{{ odoo_user }}/odoo/server/addons"
+
+      odoo_addons_debian_packages:
+        - python3-openpyxl
+        - python3-numpy
+```
+
 Standard installation but with PostgreSQL installed on a remote host (and
 available from your Ansible inventory):
 

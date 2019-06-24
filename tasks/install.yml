@@ -36,6 +36,18 @@
   tags:
     - odoo_project
 
+- name: Enterprise repository already cloned?
+  stat: path={{ odoo_enterprise_repo_dest }}
+  register: enterprise_path
+  tags:
+    - odoo_project
+
+- name: Addons repository already cloned?
+  stat: path={{ odoo_addons_repo_dest }}
+  register: addons_path
+  tags:
+    - odoo_project
+
 - name: Clone project repository (Mercurial)
   become: yes
   become_user: "{{ odoo_user }}"
@@ -58,6 +70,34 @@
                   or (odoo_repo_update and 'yes' or 'no') }}
         depth={{ odoo_repo_depth }}
   when: odoo_install_type != 'pip' and odoo_repo_type == 'git' and odoo_repo_url
+  notify: Restart Odoo
+  tags:
+    - odoo_project
+
+- name: Clone enterprise repository (Git)
+  become: yes
+  become_user: "{{ odoo_user }}"
+  git:  repo={{ odoo_enterprise_repo_url }}
+        dest={{ odoo_enterprise_repo_dest }}
+        version={{ odoo_enterprise_repo_rev | string }}
+        update={{ enterprise_path.stat.exists == False and 'yes'
+                  or (odoo_enterprise_repo_update and 'yes' or 'no') }}
+        depth={{ odoo_enterprise_repo_depth }}
+  when: odoo_install_type != 'pip' and odoo_repo_type == 'git' and odoo_enterprise_repo_url
+  notify: Restart Odoo
+  tags:
+    - odoo_project
+
+- name: Clone addons repository (Git)
+  become: yes
+  become_user: "{{ odoo_user }}"
+  git:  repo={{ odoo_addons_repo_url }}
+        dest={{ odoo_addons_repo_dest }}
+        version={{ odoo_addons_repo_rev | string }}
+        update={{ addons_path.stat.exists == False and 'yes'
+                  or (odoo_addons_repo_update and 'yes' or 'no') }}
+        depth={{ odoo_addons_repo_depth }}
+  when: odoo_install_type != 'pip' and odoo_repo_type == 'git' and odoo_addons_repo_url
   notify: Restart Odoo
   tags:
     - odoo_project
@@ -93,4 +133,9 @@
   when: (odoo_version | int) >= 9
   tags:
     - odoo
+    - odoo_packages
+
+- name: Install addons dependencies
+  import_tasks: install_addons_dependencies.yml
+  tags:
     - odoo_packages
