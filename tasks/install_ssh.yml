@@ -2,12 +2,19 @@
 
 - block:
 
+    - name: Generate SSH key for the Odoo user (no overwrite)
+      user:
+        name: "{{ odoo_user }}"
+        generate_ssh_key: "{{ odoo_user_generate_ssh_key and 'yes' or 'no' }}"
+      when: odoo_user_generate_ssh_key != False
+
     - name: SSH - Install private and public keys for the Odoo user
       copy:
         src: "{{ item.value }}"
         dest: "{{ odoo_user_ssh_dir }}/id_rsa{{ '.pub' if item.key == 'pub' else '' }}"
         mode: "{{ '0600' if item.key == 'priv' else '0644' }}"
       with_dict: "{{ odoo_user_ssh_key }}"
+      when: odoo_user_generate_ssh_key is not defined or odoo_user_generate_ssh_key == False
 
     - name: SSH - Remove private and public keys if none is defined
       file:
@@ -16,7 +23,7 @@
       with_list:
           - "{{ odoo_user_ssh_dir }}/id_rsa"
           - "{{ odoo_user_ssh_dir }}/id_rsa.pub"
-      when: not odoo_user_ssh_key
+      when: odoo_user_ssh_key and (odoo_user_generate_ssh_key is not defined or odoo_user_generate_ssh_key == False)
 
     - name: SSH - Make sure the SSH directory exists
       file:
@@ -49,6 +56,21 @@
         key: "{{ lookup('file', item) }}"
       with_fileglob:
         - "{{ odoo_user_sshkeys }}"
+
+    - name: Check if SSH public key for the Odoo user exists
+      stat:
+        path: "{{ odoo_user_ssh_dir }}/id_rsa.pub"
+      register: ssh_pub_key
+
+    - name: Check SSH public key for the Odoo user
+      command: /bin/cat {{ odoo_user_ssh_dir }}/id_rsa.pub
+      register: cat_ssh_pub_key
+      changed_when: False
+      when: ssh_pub_key.stat.exists
+
+    - name: Print SSH public key for the Odoo user
+      debug: var=cat_ssh_pub_key.stdout
+      when: ssh_pub_key.stat.exists
 
   become: yes
   become_user: "{{ odoo_user }}"

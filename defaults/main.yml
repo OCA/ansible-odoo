@@ -140,3 +140,4 @@ odoo_user_ssh_known_hosts: []
 # FIXME: 'odoo_user_sshkeys' option (and the underlying task) needs refactoring
 # to handle the state of SSH public keys (present/absent).
 odoo_user_sshkeys: ""       # ./path/to/public_keys/*
+odoo_user_generate_ssh_key: False
