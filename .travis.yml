@@ -63,7 +63,11 @@ env:
   - IMAGE="ubuntu:xenial" ODOO_VERSION=11.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
   - IMAGE="ubuntu:xenial" ODOO_VERSION=11.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
   - IMAGE="ubuntu:xenial" ODOO_VERSION=11.0 ODOO_INSTALL_TYPE=pip ANSIBLE_VERSION="2.4,<2.5"
-  # Ubuntu 14.04 (trusty)
+  # Ubuntu 18.04 (bionic)
+  #     Odoo 11.0
+  - IMAGE="ubuntu:bionic" ODOO_VERSION=11.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:bionic" ODOO_VERSION=11.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
+  - IMAGE="ubuntu:bionic" ODOO_VERSION=11.0 ODOO_INSTALL_TYPE=pip ANSIBLE_VERSION="2.4,<2.5"
   #     Odoo 12.0
   - IMAGE="ubuntu:bionic" ODOO_VERSION=12.0 ODOO_INSTALL_TYPE=standard ANSIBLE_VERSION="2.4,<2.5"
   - IMAGE="ubuntu:bionic" ODOO_VERSION=12.0 ODOO_INSTALL_TYPE=buildout ANSIBLE_VERSION="2.4,<2.5"
