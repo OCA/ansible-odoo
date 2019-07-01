@@ -27,11 +27,11 @@ Minimum Ansible Version: 2.4
 
 | System / Odoo | 8.0 | 9.0 | 10.0 | 11.0 | 12.0 |
 |---------------|-----|-----|------|------|------|
-| Debian 8      | yes | yes | yes  |  -   | -    |
-| Debian 9      | yes | yes | yes  | yes  | -    |
-| Ubuntu 14.04  | yes | yes | yes  |  -   | -    |
-| Ubuntu 16.04  | yes | yes | yes  | yes  | -    |
-| Ubuntu 18.04  | yes | yes | yes  | yes  | yes  |
+| Debian 8      | yes | yes | yes  |  -   |  -   |
+| Debian 9      | yes | yes | yes  | yes  |  -   |
+| Ubuntu 14.04  | yes | yes | yes  |  -   |  -   |
+| Ubuntu 16.04  | yes | yes | yes  |  -   |  -   |
+| Ubuntu 18.04  | yes | yes | yes  |  -   | yes  |
 
 ## Example (Playbook)
 
