@@ -1,0 +1,103 @@
+---
+
+odoo_debian_packages:
+    - python3-dev
+    - python3-openssl
+    - python3-markupsafe
+    # Dependencies taken from the deb package
+    - python3-babel
+    - python3-chardet
+    - python3-dateutil
+    - python3-decorator
+    - python3-docutils
+    - python3-feedparser
+    - python3-gevent
+    - python3-html2text
+    - python3-jinja2
+    - python3-libsass
+    - python3-lxml
+    - python3-mako
+    - python3-mock
+    - python3-ofxparse
+    - python3-passlib
+    - python3-pil
+    - python3-psutil
+    - python3-psycopg2
+    - python3-pydot
+    - python3-pyldap
+    - python3-pyparsing
+    - python3-pypdf2
+    - python3-qrcode
+    - python3-reportlab
+    - python3-requests
+    - python3-serial
+    - python3-suds
+    - python3-tz
+    - python3-usb
+    - python3-vatnumber
+    - python3-vobject
+    - python3-werkzeug
+    - python3-xlsxwriter
+
+odoo_nodejs_apt_package: "nodejs=6.*"
+odoo_nodejs_apt_repo: "node_6.x"
+odoo_npm_packages:
+    - name: less
+      version: 2.7.2
+    - name: less-plugin-clean-css
+      version: 1.5.1
+    - name: phantomjs-prebuilt
+      version: 2.1.15
+
+odoo_pip_dependencies:
+    - wrapt
+    - setuptools-odoo
+    - odoo-autodiscover
+
+odoo_pip_build_dependencies:
+    - python3-virtualenv
+    - build-essential
+    - python3-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - libpq-dev
+    - libldap2-dev
+    - libsasl2-dev
+    - libopenjp2-7-dev
+    - libjpeg62-turbo-dev
+    - libtiff5-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
+    - libssl-dev
+
+odoo_buildout_build_dependencies:
+    - virtualenv
+    - build-essential
+    - python3-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - libpq-dev
+    - libldap2-dev
+    - libsasl2-dev
+    - libopenjp2-7-dev
+    - libjpeg62-turbo-dev
+    - libtiff5-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
+
+odoo_buildout_venv_cmd: "python3 -m virtualenv --no-setuptools --python=python3 {{ odoo_buildout_venv_path }}"
+odoo_pip_venv_cmd: "python3 -m virtualenv --python=python3 {{ odoo_pip_venv_path }}"
+
+odoo_wkhtmltox_version: 0.12.5
+
+odoo_wkhtmltox_depends:
+    - fontconfig
+    - libfontconfig1
+    - libfreetype6
+    - zlib1g
+    - libx11-6
+    - libxext6
+    - libxrender1
+    - libjpeg62-turbo
