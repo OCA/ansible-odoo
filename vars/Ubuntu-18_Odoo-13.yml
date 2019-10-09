@@ -1,0 +1,124 @@
+---
+
+odoo_debian_packages:
+    - python3-dev
+    - python3-pip
+    # Python pyldap requirements
+    - libldap2-dev
+    - libsasl2-dev
+    # Python lxml requirements
+    - libxml2
+    - libxml2-dev
+    - libxslt1-dev
+
+odoo_pip_executable: "pip3"
+odoo_pypi_packages:
+  # Straight from the Odoo requirements.txt
+  - Babel==2.3.4
+  - chardet==3.0.4
+  - decorator==4.0.10
+  - docutils==0.12
+  - ebaysdk==2.1.5
+  - feedparser==5.2.1
+  - gevent==1.1.2 ; python_version < '3.7'
+  - gevent==1.3.4 ; python_version >= '3.7'
+  - greenlet==0.4.10 ; python_version < '3.7'
+  - greenlet==0.4.13 ; python_version >= '3.7'
+  - html2text==2016.9.19
+  - Jinja2==2.10.1
+  - libsass==0.12.3
+  - lxml==3.7.1 ; python_version < '3.7'
+  - lxml==4.2.3 ; python_version >= '3.7'
+  - Mako==1.0.4
+  - MarkupSafe==0.23
+  - mock==2.0.0
+  - num2words==0.5.6
+  - ofxparse==0.16
+  - passlib==1.6.5
+  - Pillow==5.4.0
+  - polib==1.1.0
+  - psutil==4.3.1
+  - psycopg2==2.7.3.1
+  - pydot==1.2.3
+  - pyldap==2.4.28
+  - pyparsing==2.1.10
+  - PyPDF2==1.26.0
+  - pyserial==3.1.1
+  - python-dateutil==2.5.3
+  - pytz==2016.7
+  - pyusb==1.0.0
+  - qrcode==5.3
+  - reportlab==3.3.0
+  - requests==2.20.0
+  - zeep==3.1.0
+  - vatnumber==1.2
+  - vobject==0.9.3
+  - Werkzeug==0.14.1
+  - XlsxWriter==0.9.3
+  - xlwt==1.3.*
+  - xlrd==1.0.0
+
+odoo_nodejs_apt_package: "nodejs=6.*"
+odoo_nodejs_apt_repo: "node_6.x"
+odoo_npm_packages:
+    - name: less
+      version: 2.7.2
+    - name: less-plugin-clean-css
+      version: 1.5.1
+    - name: phantomjs-prebuilt
+      version: 2.1.15
+
+odoo_pip_dependencies:
+    - wrapt
+    - setuptools-odoo
+    - odoo-autodiscover
+
+odoo_pip_build_dependencies:
+    - python3-virtualenv
+    - build-essential
+    - python3-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - libpq-dev
+    - libldap2-dev
+    - libsasl2-dev
+    - libopenjp2-7-dev
+    - libjpeg-turbo8-dev
+    - libtiff5-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
+    - libssl-dev
+
+odoo_buildout_build_dependencies:
+    - virtualenv
+    - build-essential
+    - python3-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - libpq-dev
+    - libldap2-dev
+    - libsasl2-dev
+    - libopenjp2-7-dev
+    - libjpeg-turbo8-dev
+    - libtiff5-dev
+    - libfreetype6-dev
+    - liblcms2-dev
+    - libwebp-dev
+
+odoo_buildout_venv_cmd: "python3 -m virtualenv --no-setuptools --python=python3 {{ odoo_buildout_venv_path }}"
+odoo_pip_venv_cmd: "python3 -m virtualenv --python=python3 {{ odoo_pip_venv_path }}"
+
+odoo_wkhtmltox_version: 0.12.5
+odoo_wkhtmltox_urls:
+  - https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/{{ odoo_wkhtmltox_version }}/wkhtmltox_{{ odoo_wkhtmltox_version }}-1.{{ ansible_distribution_release }}_{{ odoo_debian_arch }}.deb
+
+odoo_wkhtmltox_depends:
+    - fontconfig
+    - libfontconfig1
+    - libfreetype6
+    - zlib1g
+    - libx11-6
+    - libxext6
+    - libxrender1
+    - libjpeg-turbo8
