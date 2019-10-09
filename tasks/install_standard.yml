@@ -10,7 +10,9 @@
     - odoo_packages
 
 - name: Install Odoo dependencies (PyPi)
-  pip: name={{ item }}
+  pip:
+    name: "{{ item }}"
+    executable: "{{ odoo_pip_executable }}"
   with_items: "{{ odoo_pypi_packages }}"
   tags:
     - odoo_packages
