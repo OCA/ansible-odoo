@@ -1,6 +1,7 @@
 ansible_ssh_pipelining: true
 
 odoo_install_type: standard     # standard, buildout
+odoo_pip_executable: "pip"
 odoo_version: 11.0
 odoo_service: odoo
 odoo_user: odoo
