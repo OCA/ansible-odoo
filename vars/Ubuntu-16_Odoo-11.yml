@@ -40,6 +40,7 @@ odoo_debian_packages:
     - python3-xlsxwriter
     - python3-yaml
 
+odoo_pip_executable: "pip3"
 odoo_pypi_packages:
     - psycogreen
     - qrcode
