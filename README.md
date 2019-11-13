@@ -25,12 +25,13 @@ Minimum Ansible Version: 2.4
 
 ## Supported versions and systems
 
-| System / Odoo | 8.0 | 9.0 | 10.0 | 11.0 |
-|---------------|-----|-----|------|------|
-| Debian 8      | yes | yes | yes  |  -   |
-| Debian 9      | yes | yes | yes  | yes  |
-| Ubuntu 14.04  | yes | yes | yes  |  -   |
-| Ubuntu 16.04  | yes | yes | yes  | yes  |
+| System / Odoo | 8.0 | 9.0 | 10.0 | 11.0 | 12.0 |
+|---------------|-----|-----|------|------|------|
+| Debian 8      | yes | yes | yes  |  -   |  -   |
+| Debian 9      | yes | yes | yes  | yes  |  -   |
+| Ubuntu 14.04  | yes | yes | yes  |  -   |  -   |
+| Ubuntu 16.04  | yes | yes | yes  |  -   |  -   |
+| Ubuntu 18.04  |  -  |  -  |  -   | yes  | yes  |
 
 ## Example (Playbook)
 
@@ -45,7 +46,7 @@ the same host):
   become: yes
   roles:
     - role: odoo
-      odoo_version: 11.0
+      odoo_version: 12.0
       odoo_config_admin_passwd: SuPerPassWorD
 ```
 
@@ -61,7 +62,7 @@ available from your Ansible inventory):
   become: yes
   roles:
     - role: odoo
-      odoo_version: 11.0
+      odoo_version: 12.0
       odoo_config_admin_passwd: SuPerPassWorD
       odoo_config_db_host: pg_server
       odoo_config_db_user: odoo
@@ -87,7 +88,7 @@ Here we set some options required by the ``connector`` framework:
   become: yes
   roles:
     - role: odoo
-      odoo_version: 11.0
+      odoo_version: 12.0
       odoo_repo_type: git
       odoo_repo_url: https://SERVER/REPO
       odoo_repo_rev: master
@@ -109,7 +110,7 @@ Here we set some options required by the ``connector`` framework:
 
 Pip installation (assuming that PostgreSQL is installed and running on
 the same host). We need to ensure that the environment variable LC_ALL is used
-if Odoo version 11 is to be used:
+if Odoo version 12 is to be used:
 
 ```yaml
 - name: Odoo
@@ -118,8 +119,8 @@ if Odoo version 11 is to be used:
   roles:
     - role: odoo
       odoo_install_type: pip
-      odoo_version: 11.0
-      odoo_pip_requirements_url: https://raw.githubusercontent.com/OCA/sample-oca-pip-requirements/11.0/requirements.txt
+      odoo_version: 12.0
+      odoo_pip_requirements_url: https://raw.githubusercontent.com/OCA/sample-oca-pip-requirements/12.0/requirements.txt
       odoo_config_admin_passwd: SuPerPassWorD
   environment:
     LC_ALL: en_US.UTF-8
@@ -139,7 +140,7 @@ by Buildout:
   roles:
     - role: odoo
       odoo_install_type: buildout
-      odoo_version: 11.0
+      odoo_version: 12.0
       odoo_repo_type: git
       odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
       odoo_repo_rev: "{{ odoo_version }}"
@@ -156,7 +157,7 @@ your Ansible inventory):
   roles:
     - role: odoo
       odoo_install_type: buildout
-      odoo_version: 11.0
+      odoo_version: 12.0
       odoo_repo_type: git
       odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
       odoo_repo_rev: "{{ odoo_version }}"
@@ -191,7 +192,7 @@ We just set the relevant options to tell Ansible the files to use with the
   roles:
     - role: odoo
       odoo_install_type: buildout
-      odoo_version: 11.0
+      odoo_version: 12.0
       odoo_repo_type: git
       odoo_repo_url: https://SERVER/REPO
       odoo_repo_rev: master
