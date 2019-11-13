@@ -43,7 +43,8 @@ odoo_debian_packages:
     - python3-werkzeug
     - python3-xlsxwriter
 
-# odoo_pypi_packages:
+odoo_pypi_packages:
+    - xlwt
 #     - psycogreen
 #     - qrcode
 #     - pyldap
