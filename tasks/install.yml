@@ -30,6 +30,12 @@
   tags:
     - odoo_log
 
+- name: Create Odoo work directory
+  file: path={{ odoo_workdir }} state=directory
+        owner={{ odoo_user }} group={{ odoo_user }} force=no
+  tags:
+    - odoo_project
+
 - name: Project repository already cloned?
   stat: path={{ odoo_repo_dest }}
   register: project_path
