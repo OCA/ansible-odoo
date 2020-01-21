@@ -47,6 +47,12 @@ the same host):
     - role: odoo
       odoo_version: 11.0
       odoo_config_admin_passwd: SuPerPassWorD
+
+      ## Recommended directories
+      ## Default/legacy settings to maintain backwards compatibility,
+      ## so existing deployments won't break.
+      # odoo_rootdir: /opt/odoo  # Default/legacy "/home/{{ odoo_user }}"
+      # odoo_config_data_dir: "/srv/odoo"  # Default/legacy "/home/{{ odoo_user }}/.local/share/Odoo"
 ```
 
 With the standard installation type you configure Odoo with the available
@@ -66,6 +72,12 @@ available from your Ansible inventory):
       odoo_config_db_host: pg_server
       odoo_config_db_user: odoo
       odoo_config_db_passwd: PaSsWoRd
+
+      ## Recommended directories
+      ## Default/legacy settings to maintain backwards compatibility,
+      ## so existing deployments won't break.
+      # odoo_rootdir: /opt/odoo  # Default/legacy "/home/{{ odoo_user }}"
+      # odoo_config_data_dir: "/srv/odoo"  # Default/legacy "/home/{{ odoo_user }}/.local/share/Odoo"
 ```
 
 Standard installation from a personnal Git repository such as your repository
@@ -96,11 +108,11 @@ Here we set some options required by the ``connector`` framework:
         ODOO_CONNECTOR_CHANNELS: root:2
       odoo_config_admin_passwd: SuPerPassWorD
       odoo_config_addons_path:
-        - "/home/{{ odoo_user }}/odoo/server/openerp/addons"
-        - "/home/{{ odoo_user }}/odoo/server/addons"
-        - "/home/{{ odoo_user }}/odoo/addons_oca_web"
-        - "/home/{{ odoo_user }}/odoo/addons_oca_connector"
-        - "/home/{{ odoo_user }}/odoo/addons"
+        - "{{ odoo_workdir }}/odoo/server/openerp/addons"
+        - "{{ odoo_workdir }}/odoo/server/addons"
+        - "{{ odoo_workdir }}/odoo/addons_oca_web"
+        - "{{ odoo_workdir }}/odoo/addons_oca_connector"
+        - "{{ odoo_workdir }}/odoo/addons"
       odoo_config_server_wide_modules: web,web_kanban,connector
       odoo_config_workers: 8
 ```
@@ -143,7 +155,7 @@ by Buildout:
       odoo_repo_type: git
       odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
       odoo_repo_rev: "{{ odoo_version }}"
-      odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
+      odoo_repo_dest: "{{ odoo_workdir }}/odoo"
 ```
 
 The same but with PostgreSQL installed on a remote host (and available from
@@ -160,7 +172,7 @@ your Ansible inventory):
       odoo_repo_type: git
       odoo_repo_url: https://github.com/osiell/odoo-buildout-example.git
       odoo_repo_rev: "{{ odoo_version }}"
-      odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
+      odoo_repo_dest: "{{ odoo_workdir }}/odoo"
       odoo_config_db_host: pg_server
       odoo_config_db_user: odoo
       odoo_config_db_passwd: PaSsWoRd
@@ -195,9 +207,9 @@ We just set the relevant options to tell Ansible the files to use with the
       odoo_repo_type: git
       odoo_repo_url: https://SERVER/REPO
       odoo_repo_rev: master
-      odoo_repo_dest: "/home/{{ odoo_user }}/odoo"
-      odoo_buildout_bootstrap_path: "/home/{{ odoo_user }}/odoo/bin/bootstrap.py"
-      odoo_buildout_config_path: "/home/{{ odoo_user }}/odoo/buildout.prod.cfg"
+      odoo_repo_dest: "{{ odoo_workdir }}/odoo"
+      odoo_buildout_bootstrap_path: "{{ odoo_workdir }}/odoo/bin/bootstrap.py"
+      odoo_buildout_config_path: "{{ odoo_workdir }}/odoo/buildout.prod.cfg"
 ```
 
 ## Variables

@@ -5,16 +5,16 @@
            dest="/opt/pfbfer.zip"
 
 - name: Create the font directory
-  file: path="/home/{{ odoo_user }}/fonts" state=directory
+  file: path="{{ odoo_workdir }}/fonts" state=directory
 
 - name: Install unzip
   apt: name=unzip state=present
 
 - name: Unzip the ReportLab fonts
   unarchive: src="/opt/pfbfer.zip"
-             dest="/home/{{ odoo_user }}/fonts"
+             dest="{{ odoo_workdir }}/fonts"
              owner={{ odoo_user }}
              group={{ odoo_user }}
              mode="u=rwX,go=rX"
              copy=No
-             creates="/home/{{ odoo_user }}/fonts/_abi____.pfb"
+             creates="{{ odoo_workdir }}/fonts/_abi____.pfb"

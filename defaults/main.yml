@@ -12,15 +12,18 @@ odoo_init: True
 odoo_init_env: {}
     #VAR1: value1
     #VAR2: value2
+odoo_rootdir: "/home/{{ odoo_user }}"  # Recommended: /opt/odoo
+    # This default is a legacy setting, to maintain backwards
+    # compatibility, so existing deployments won't break.
+odoo_workdir: "{{ odoo_rootdir }}/odoo"
+odoo_serverdir: "{{ odoo_install_type == 'buildout' and odoo_rootdir+'/'+odoo_user+'/odoo/parts/odoo' or odoo_rootdir+'/'+odoo_user+'/server' }}"
 odoo_logdir: "/var/log/{{ odoo_user }}"
 odoo_logfile: "{{ ansible_service_mgr != 'systemd' and ('/'.join([odoo_logdir, odoo_service]) + '.log') or ''}}"
-odoo_workdir: "/home/{{ odoo_user }}/odoo"
-odoo_rootdir: "{{ odoo_install_type == 'buildout' and '/home/'+odoo_user+'/odoo/parts/odoo' or '/home/'+odoo_user+'/odoo/server' }}"
 
 # Project repository to deploy
 odoo_repo_type: git     # git or hg
 odoo_repo_url: "{{ odoo_install_type == 'buildout' and 'https://github.com/osiell/odoo-buildout-example.git' or 'https://github.com/odoo/odoo.git' }}"
-odoo_repo_dest: "{{ odoo_install_type == 'buildout' and odoo_workdir or odoo_rootdir }}"
+odoo_repo_dest: "{{ odoo_install_type == 'buildout' and odoo_workdir or odoo_serverdir }}"
 odoo_repo_rev: "{{ odoo_version }}"
 odoo_repo_update: True  # Update the working copy or not. This option is
                         # ignored on the first run (a checkout of the working
@@ -39,15 +42,18 @@ odoo_postgresql_extensions:
     - unaccent
 
 # Standard installation/configuration options (odoo_install_type == 'standard')
-odoo_config_file: "/home/{{ odoo_user }}/{{ odoo_service }}.conf"
+odoo_config_file: "/etc/{{ odoo_service }}.conf"
 odoo_force_config: True
 odoo_config_addons_path:
-    - "/home/{{ odoo_user }}/odoo/server/{{ (odoo_version | int) < 10 and 'openerp' or 'odoo' }}/addons"
-    - "/home/{{ odoo_user }}/odoo/server/addons"
+    - "{{ odoo_workdir }}/server/{{ (odoo_version | int) < 10 and 'openerp' or 'odoo' }}/addons"
+    - "{{ odoo_workdir }}/server/addons"
 odoo_config_admin_passwd: admin
 odoo_config_auto_reload: False
 odoo_config_csv_internal_sep: ','
-odoo_config_data_dir: "/home/{{ odoo_user }}/.local/share/Odoo"
+odoo_config_data_dir: "/home/{{ odoo_user }}/.local/share/Odoo"  # Recommended: /srv/odoo
+    # This default is a legacy setting, to maintain backwards
+    # compatibility, so existing deployments won't break.
+
 odoo_config_db_host: False
 odoo_config_db_host_user: "{{ ansible_user }}"
 odoo_config_db_maxconn: 64
